@@ -28,7 +28,10 @@ from absl import app
 from absl import flags
 from absl import logging
 from android_world import registry
+from android_world.agents import base_agent
+from android_world.agents import human_agent
 from android_world.agents import infer
+from android_world.agents import random_agent
 from android_world.agents import t3a
 from android_world.env import env_launcher
 from android_world.task_evals import task_eval
@@ -81,6 +84,47 @@ _TASK = flags.DEFINE_string(
     None,
     'A specific task to run.',
 )
+_AGENT_NAME = flags.DEFINE_enum(
+    'agent_name',
+    'auto',
+    ['auto', 'human_agent', 'random_agent', 't3a_gemini_gcp', 't3a_gpt4'],
+    'Agent to use. `auto` prefers an LLM-backed T3A agent when an API key is'
+    ' available, and falls back to `random_agent` otherwise.',
+)
+
+
+def _get_agent(
+    env: env_launcher.interface.AsyncEnv,
+) -> base_agent.EnvironmentInteractingAgent:
+  """Returns the agent used by the quickstart runner."""
+  if _AGENT_NAME.value == 'auto':
+    if 'OPENAI_API_KEY' in os.environ:
+      print('Using agent: t3a_gpt4')
+      return t3a.T3A(env, infer.Gpt4Wrapper('gpt-4-turbo-2024-04-09'))
+    if 'GCP_API_KEY' in os.environ:
+      print('Using agent: t3a_gemini_gcp')
+      return t3a.T3A(
+          env, infer.GeminiGcpWrapper(model_name='gemini-1.5-pro-latest')
+      )
+    print('Using agent: random_agent (no LLM API key found)')
+    return random_agent.RandomAgent(env)
+
+  if _AGENT_NAME.value == 'human_agent':
+    print('Using agent: human_agent')
+    return human_agent.HumanAgent(env)
+  if _AGENT_NAME.value == 'random_agent':
+    print('Using agent: random_agent')
+    return random_agent.RandomAgent(env)
+  if _AGENT_NAME.value == 't3a_gemini_gcp':
+    print('Using agent: t3a_gemini_gcp')
+    return t3a.T3A(
+        env, infer.GeminiGcpWrapper(model_name='gemini-1.5-pro-latest')
+    )
+  if _AGENT_NAME.value == 't3a_gpt4':
+    print('Using agent: t3a_gpt4')
+    return t3a.T3A(env, infer.Gpt4Wrapper('gpt-4-turbo-2024-04-09'))
+
+  raise ValueError(f'Unknown agent: {_AGENT_NAME.value}')
 
 
 def _main() -> None:
@@ -104,7 +148,7 @@ def _main() -> None:
   params = task_type.generate_random_params()
   task = task_type(params)
   task.initialize_task(env)
-  agent = t3a.T3A(env, infer.Gpt4Wrapper('gpt-4-turbo-2024-04-09'))
+  agent = _get_agent(env)
 
   print('Goal: ' + str(task.goal))
   is_done = False

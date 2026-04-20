@@ -93,21 +93,9 @@ class MarkorMoveNote(Markor):
 
   @classmethod
   def generate_random_params(cls) -> dict[str, Any]:
-    subfolders = [
-        "BookNotes",
-        "CodeSnippets",
-        "DailyNotes",
-        "FitnessPlans",
-        "MeetingMinutes",
-        "PersonalJournal",
-        "RecipeCollections",
-        "StudyGuides",
-        "TravelItineraries",
-        "WorkProjects",
-    ]
-    source_folder = random.choice(subfolders)
+    source_folder = random.choice(_MARKOR_SUBFOLDERS)
     destination_folder = random.choice(
-        [folder for folder in subfolders if folder != source_folder]
+        [folder for folder in _MARKOR_SUBFOLDERS if folder != source_folder]
     )
     file_name = _generate_random_note().name
     return {
@@ -449,6 +437,116 @@ class MarkorCreateNote(Markor):
     self.create_file_task.tear_down(env)
 
 
+class MarkorCreateNoteInFolder(Markor):
+  """Task for creating a note inside an existing Markor folder."""
+
+  complexity = 2
+  schema = {
+      "type": "object",
+      "properties": {
+          "folder_name": {"type": "string"},
+          "file_name": {"type": "string"},
+          "text": {"type": "string"},
+      },
+      "required": ["folder_name", "file_name", "text"],
+  }
+  template = (
+      "In Markor, create a note named {file_name} inside the {folder_name}"
+      " folder with the following text: {text}"
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    super().__init__(params)
+    self.target_directory = file_utils.convert_to_posix_path(
+        device_constants.MARKOR_DATA, params["folder_name"]
+    )
+    self.create_file_task = file_validators.CreateFile(
+        {"file_name": params["file_name"], "text": params["text"]},
+        self.target_directory,
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.create_file_task.initialize_task(env)
+    file_utils.mkdir(self.target_directory, env.controller)
+    user_data_generation.generate_noise_files(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+    user_data_generation.generate_noise_files(
+        self.params["file_name"],
+        self.target_directory,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.create_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    note = _generate_random_note()
+    return {
+        "folder_name": random.choice(_MARKOR_SUBFOLDERS),
+        "file_name": note.name,
+        "text": note.content,
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.create_file_task.tear_down(env)
+
+
+class MarkorCreateChecklistNote(Markor):
+  """Task for creating a checklist note."""
+
+  complexity = 1.8
+  schema = {
+      "type": "object",
+      "properties": {
+          "file_name": {"type": "string"},
+          "items": {"type": "string"},
+          "text": {"type": "string"},
+      },
+      "required": ["file_name", "items", "text"],
+  }
+  template = (
+      "Create a checklist note in Markor named {file_name} with these items:"
+      " {items}. Each checklist item should be unchecked."
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    super().__init__(params)
+    self.create_file_task = file_validators.CreateFile(
+        {"file_name": params["file_name"], "text": params["text"]},
+        device_constants.MARKOR_DATA,
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.create_file_task.initialize_task(env)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.create_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    items = random.sample(_CHECKLIST_ITEMS, random.randint(3, 5))
+    return {
+        "file_name": _generate_random_note().name,
+        "items": ", ".join(items),
+        "text": "\n".join([f"- [ ] {item}" for item in items]),
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.create_file_task.tear_down(env)
+
+
 class MarkorCreateNoteFromClipboard(Markor):
   """Task for creating a note using text in clipboard in Markor."""
 
@@ -505,6 +603,290 @@ class MarkorCreateNoteFromClipboard(Markor):
   def tear_down(self, env: interface.AsyncEnv) -> None:
     super().tear_down(env)
     self.create_file_task.tear_down(env)
+
+
+class MarkorAppendToNote(Markor):
+  """Task for appending text to an existing note."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "file_name": {"type": "string"},
+          "original_content": {"type": "string"},
+          "appended_text": {"type": "string"},
+      },
+      "required": ["file_name", "original_content", "appended_text"],
+  }
+  template = (
+      "Open the Markor note {file_name} and add this text as a new line at the"
+      ' bottom: "{appended_text}".'
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=self.params["original_content"],
+    )
+    user_data_generation.generate_noise_files(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    if not file_utils.check_file_or_folder_exists(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    expected_content = (
+        self.params["original_content"] + "\n" + self.params["appended_text"]
+    )
+    correct = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["file_name"]
+        ),
+        expected_content,
+        env.controller,
+    )
+    return 1.0 if correct else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "file_name": _generate_random_note().name,
+        "original_content": generate_random_sentence(),
+        "appended_text": generate_random_sentence(),
+    }
+
+
+class MarkorCopyNote(Markor):
+  """Task for copying an existing note to a new note."""
+
+  complexity = 1.6
+  schema = {
+      "type": "object",
+      "properties": {
+          "source_name": {"type": "string"},
+          "new_name": {"type": "string"},
+          "content": {"type": "string"},
+      },
+      "required": ["source_name", "new_name", "content"],
+  }
+  template = (
+      "In Markor, copy the contents of {source_name} into a new note named"
+      " {new_name}. Leave the original note unchanged."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["source_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=self.params["content"],
+    )
+    user_data_generation.generate_noise_files(
+        self.params["source_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    for file_name in (self.params["source_name"], self.params["new_name"]):
+      if not file_utils.check_file_or_folder_exists(
+          file_name, device_constants.MARKOR_DATA, env.controller
+      ):
+        return 0.0
+      if not file_utils.check_file_content(
+          file_utils.convert_to_posix_path(
+              device_constants.MARKOR_DATA, file_name
+          ),
+          self.params["content"],
+          env.controller,
+      ):
+        return 0.0
+    return 1.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "source_name": _generate_random_note().name,
+        "new_name": _generate_random_note().name,
+        "content": generate_random_sentence(),
+    }
+
+
+class MarkorDeleteNoteInFolder(Markor):
+  """Task for deleting a note inside a Markor folder."""
+
+  complexity = 1.4
+  schema = file_validators.DeleteFile.schema
+  template = (
+      "In Markor, delete the note {file_name} from the {subfolder} folder."
+  )
+
+  def __init__(self, params: dict[str, Any]):
+    super().__init__(params)
+    self.delete_file_task = file_validators.DeleteFile(
+        params, device_constants.MARKOR_DATA
+    )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    self.delete_file_task.initialize_task(env)
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    return self.delete_file_task.is_successful(env)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    return {
+        "file_name": _generate_random_note().name,
+        "subfolder": random.choice(_MARKOR_SUBFOLDERS),
+        "noise_candidates": _NOTE_TITLES,
+    }
+
+  def tear_down(self, env: interface.AsyncEnv) -> None:
+    super().tear_down(env)
+    self.delete_file_task.tear_down(env)
+
+
+class MarkorPrependDateToNote(Markor):
+  """Task for adding a date line to the top of a note."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "file_name": {"type": "string"},
+          "date": {"type": "string"},
+          "original_content": {"type": "string"},
+      },
+      "required": ["file_name", "date", "original_content"],
+  }
+  template = (
+      "Open the Markor note {file_name} and add {date} as the first line of"
+      " the note."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=self.params["original_content"],
+    )
+    user_data_generation.generate_noise_files(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    expected_content = (
+        self.params["date"] + "\n" + self.params["original_content"]
+    )
+    correct = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["file_name"]
+        ),
+        expected_content,
+        env.controller,
+    )
+    return 1.0 if correct else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "file_name": _generate_random_note().name,
+        "date": device_constants.DT.strftime("%Y-%m-%d"),
+        "original_content": generate_random_sentence(),
+    }
+
+
+class MarkorReplaceTextInNote(Markor):
+  """Task for replacing text inside an existing note."""
+
+  complexity = 1.4
+  schema = {
+      "type": "object",
+      "properties": {
+          "file_name": {"type": "string"},
+          "old_text": {"type": "string"},
+          "new_text": {"type": "string"},
+          "original_content": {"type": "string"},
+          "updated_content": {"type": "string"},
+      },
+      "required": [
+          "file_name",
+          "old_text",
+          "new_text",
+          "original_content",
+          "updated_content",
+      ],
+  }
+  template = (
+      "In the Markor note {file_name}, replace the text \"{old_text}\" with"
+      " \"{new_text}\"."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=self.params["original_content"],
+    )
+    user_data_generation.generate_noise_files(
+        self.params["file_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    correct = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["file_name"]
+        ),
+        self.params["updated_content"],
+        env.controller,
+    )
+    return 1.0 if correct else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    old_text = random.choice(_REPLACEABLE_WORDS)
+    new_text = random.choice([
+        word for word in _REPLACEABLE_WORDS if word != old_text
+    ])
+    prefix = generate_random_sentence()
+    suffix = generate_random_sentence()
+    original_content = f"{prefix}\nStatus: {old_text}\n{suffix}"
+    updated_content = f"{prefix}\nStatus: {new_text}\n{suffix}"
+    return {
+        "file_name": _generate_random_note().name,
+        "old_text": old_text,
+        "new_text": new_text,
+        "original_content": original_content,
+        "updated_content": updated_content,
+    }
 
 
 class MarkorMergeNotes(Markor):
@@ -815,6 +1197,71 @@ class MarkorAddNoteHeader(Markor):
     }
 
 
+class MarkorRenameNote(Markor):
+  """Task for renaming an existing note without changing its content."""
+
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "original_name": {"type": "string"},
+          "new_name": {"type": "string"},
+          "original_content": {"type": "string"},
+      },
+      "required": ["original_name", "new_name", "original_content"],
+  }
+  template = (
+      "Rename the Markor note {original_name} to {new_name} without changing"
+      " its contents."
+  )
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.create_file(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        content=self.params["original_content"],
+    )
+    user_data_generation.generate_noise_files(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+        _NOTE_TITLES,
+    )
+
+  def is_successful(self, env: interface.AsyncEnv) -> float:
+    super().is_successful(env)
+    if file_utils.check_file_or_folder_exists(
+        self.params["original_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    if not file_utils.check_file_or_folder_exists(
+        self.params["new_name"],
+        device_constants.MARKOR_DATA,
+        env.controller,
+    ):
+      return 0.0
+    correct = file_utils.check_file_content(
+        file_utils.convert_to_posix_path(
+            device_constants.MARKOR_DATA, self.params["new_name"]
+        ),
+        self.params["original_content"],
+        env.controller,
+    )
+    return 1.0 if correct else 0.0
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "original_name": _generate_random_note().name,
+        "new_name": _generate_random_note().name,
+        "original_content": generate_random_sentence(),
+    }
+
+
 class MarkorTranscribeReceipt(task_eval.TaskEval):
   """Task for creating a markdown file from a receipt image using Simple Gallery and Markor.
 
@@ -961,4 +1408,36 @@ _NOTE_TITLES = [
     "favorite_book_quotes.md",
     "garden_layout_plan.md",
     "upcoming_presentation_outline.md",
+]
+
+_MARKOR_SUBFOLDERS = [
+    "BookNotes",
+    "CodeSnippets",
+    "DailyNotes",
+    "FitnessPlans",
+    "MeetingMinutes",
+    "PersonalJournal",
+    "RecipeCollections",
+    "StudyGuides",
+    "TravelItineraries",
+    "WorkProjects",
+]
+
+_CHECKLIST_ITEMS = [
+    "book train tickets",
+    "call the dentist",
+    "confirm lunch reservation",
+    "email project update",
+    "pack charging cable",
+    "pay utility bill",
+    "pick up groceries",
+    "review meeting notes",
+]
+
+_REPLACEABLE_WORDS = [
+    "blocked",
+    "confirmed",
+    "draft",
+    "pending",
+    "scheduled",
 ]

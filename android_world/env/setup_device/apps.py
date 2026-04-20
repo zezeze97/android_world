@@ -36,6 +36,22 @@ APP_DATA = file_utils.convert_to_posix_path(os.path.dirname(__file__),
 'app_data')
 
 
+def _click_optional_element(
+    controller: tools.AndroidToolController, text: str
+) -> None:
+  """Clicks an element if it is present in a setup flow."""
+  try:
+    controller.click_element(text)
+  except ValueError:
+    logging.info('Optional setup element "%s" was not present.', text)
+
+
+def _press_key(env: interface.AsyncEnv, keycode: str) -> None:
+  adb_utils.issue_generic_request(
+      ["shell", "input", "keyevent", keycode], env.controller
+  )
+
+
 def download_app_data(file_name: str) -> str:
   """Downloads file from a GCS bucket, if not cached, and installs it."""
   cache_dir = file_utils.convert_to_posix_path(
@@ -163,13 +179,13 @@ class ChromeApp(AppSetup):
       controller = tools.AndroidToolController(env=env.controller)
       time.sleep(2.0)
       # Welcome screen.
-      controller.click_element("Accept & continue")
+      _click_optional_element(controller, "Accept & continue")
       time.sleep(2.0)
       # Turn on sync?
-      controller.click_element("No thanks")
+      _click_optional_element(controller, "No thanks")
       time.sleep(2.0)
       # Enable notifications?
-      controller.click_element("No thanks")
+      _click_optional_element(controller, "No thanks")
       time.sleep(2.0)
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
@@ -205,10 +221,10 @@ class ContactsApp(AppSetup):
       controller = tools.AndroidToolController(env=env.controller)
       time.sleep(2.0)
       # Back up & organize your contacts with Google.
-      controller.click_element("Skip")
+      _click_optional_element(controller, "Skip")
       time.sleep(2.0)
       # Allow Contacts to send you notifications?
-      controller.click_element("Don't allow")
+      _click_optional_element(controller, "Don't allow")
       time.sleep(2.0)
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
@@ -257,9 +273,9 @@ class MarkorApp(AppSetup):
       controller.click_element("DONE")
       time.sleep(2.0)
 
-      controller.click_element("OK")
+      _click_optional_element(controller, "OK")
       time.sleep(2.0)
-      controller.click_element("Allow access to manage all files")
+      _click_optional_element(controller, "Allow access to manage all files")
       time.sleep(2.0)
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
@@ -303,13 +319,28 @@ class ClipperApp(AppSetup):
   @classmethod
   def setup(cls, env: interface.AsyncEnv) -> None:
     super().setup(env)
-    controller = tools.AndroidToolController(env=env.controller)
-    adb_utils.launch_app(cls.app_name, env.controller)
+    package = adb_utils.extract_package_name(
+        adb_utils.get_adb_activity(cls.app_name)
+    )
+    adb_utils.issue_generic_request(
+        [
+            "shell",
+            "monkey",
+            "-p",
+            package,
+            "-candroid.intent.category.LAUNCHER",
+            "1",
+        ],
+        env.controller,
+    )
     try:
       time.sleep(2.0)
-      controller.click_element("Continue")
-      time.sleep(2.0)
-      controller.click_element("OK")
+      # Clipper can show Android's old-target permission review activity.
+      # Driving it with key events is more reliable than querying UI elements
+      # while the permission controller is rebuilding its view hierarchy.
+      for keycode in ("61", "61", "66", "66"):
+        _press_key(env, keycode)
+        time.sleep(0.5)
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
 
@@ -396,9 +427,9 @@ class SimpleGalleryProApp(AppSetup):
     try:
       controller = tools.AndroidToolController(env=env.controller)
       time.sleep(2.0)
-      controller.click_element("All files")
+      _click_optional_element(controller, "All files")
       time.sleep(2.0)
-      controller.click_element("Allow access to manage all files")
+      _click_optional_element(controller, "Allow access to manage all files")
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
 
@@ -426,9 +457,9 @@ class SimpleSMSMessengerApp(AppSetup):
     try:
       controller = tools.AndroidToolController(env=env.controller)
       time.sleep(2.0)
-      controller.click_element("SMS Messenger")
+      _click_optional_element(controller, "SMS Messenger")
       time.sleep(2.0)
-      controller.click_element("Set as default")
+      _click_optional_element(controller, "Set as default")
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
 
@@ -562,12 +593,8 @@ class OsmAndApp(AppSetup):
 
     try:
       controller = tools.AndroidToolController(env=env.controller)
-      controller.click_element("SKIP DOWNLOAD")
+      _click_optional_element(controller, "SKIP DOWNLOAD")
       time.sleep(2.0)
-    except ValueError:
-      logging.warn(
-          "First time setup did not click through all anticipated screens."
-      )
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
 
@@ -633,7 +660,7 @@ class OpenTracksApp(AppSetup):
     time.sleep(2.0)
     controller = tools.AndroidToolController(env=env.controller)
     # Give permission for bluetooth, can't be done through adb.
-    controller.click_element("Allow")
+    _click_optional_element(controller, "Allow")
     adb_utils.launch_app("activity tracker", env.controller)
     adb_utils.close_app("activity tracker", env.controller)
 
@@ -678,13 +705,13 @@ class VlcApp(AppSetup):
     time.sleep(2.0)
     try:
       controller = tools.AndroidToolController(env=env.controller)
-      controller.click_element("Skip")
+      _click_optional_element(controller, "Skip")
       time.sleep(2.0)
-      controller.click_element("GRANT PERMISSION")
+      _click_optional_element(controller, "GRANT PERMISSION")
       time.sleep(2.0)
-      controller.click_element("OK")
+      _click_optional_element(controller, "OK")
       time.sleep(2.0)
-      controller.click_element("Allow access to manage all files")
+      _click_optional_element(controller, "Allow access to manage all files")
     finally:
       adb_utils.close_app(cls.app_name, env.controller)
 
@@ -728,7 +755,7 @@ class JoplinApp(AppSetup):
     )
     time.sleep(10.0)
     adb_utils.close_app(cls.app_name, env.controller)
-    time.sleep(10.0)
+    joplin_app_utils.wait_for_db_ready(env)
 
     # Calling clear_dbs() without having added a note seems to make
     # the sqlite table inaccessible. Every subsequent call to clear_dbs()

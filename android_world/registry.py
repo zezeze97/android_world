@@ -29,6 +29,7 @@ from android_world.task_evals.single import camera
 from android_world.task_evals.single import clock
 from android_world.task_evals.single import contacts
 from android_world.task_evals.single import expense
+from android_world.task_evals.single import expanded_tasks
 from android_world.task_evals.single import files
 from android_world.task_evals.single import markor
 from android_world.task_evals.single import osmand
@@ -114,6 +115,7 @@ class TaskRegistry:
       browser.BrowserDraw,
       browser.BrowserMaze,
       browser.BrowserMultiply,
+      *expanded_tasks.ALL_TASKS,
       calendar.SimpleCalendarAddOneEvent,
       calendar.SimpleCalendarAddOneEventInTwoWeeks,
       calendar.SimpleCalendarAddOneEventRelativeDay,

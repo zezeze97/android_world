@@ -16,6 +16,7 @@
 
 import os
 import random
+import time
 
 from android_world.env import adb_utils
 from android_world.env import interface
@@ -33,6 +34,23 @@ _DB_PATH = "/data/data/net.cozic.joplin/databases/joplin.sqlite"
 _APP_NAME = "joplin"
 # Sometimes this field gets added to the Joplin db, but we do not need it.
 _EXCLUDE_FIELD = "deleted_time"
+
+
+def wait_for_db_ready(
+    env: interface.AsyncEnv,
+    timeout_sec: float = 60.0,
+    poll_interval_sec: float = 5.0,
+) -> None:
+  """Waits until Joplin has created the database tables used by tasks."""
+  deadline = time.time() + timeout_sec
+  tables = (_FOLDER_TABLE, _NOTES_TABLE, _NOTES_NORMALIZED_TABLE)
+  while time.time() < deadline:
+    if all(sqlite_utils.table_exists(table, _DB_PATH, env) for table in tables):
+      return
+    adb_utils.launch_app(_APP_NAME, env.controller)
+    time.sleep(poll_interval_sec)
+    adb_utils.close_app(_APP_NAME, env.controller)
+  raise ValueError("Joplin database tables were not created in time.")
 
 
 def setup_task_state(

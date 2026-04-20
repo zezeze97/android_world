@@ -3,21 +3,30 @@
     "task_name": "AudioRecorderRecordAudio",
     "task_template": "Record an audio clip using Audio Recorder app and save it.",
     "difficulty": "easy",
-    "tags": ["requires_setup"],
+    "tags": [
+      "requires_setup"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "AudioRecorderRecordAudioWithFileName",
     "task_template": "Record an audio clip and save it with name \"{file_name}\" using Audio Recorder app.",
     "difficulty": "easy",
-    "tags": ["data_entry", "complex_ui_understanding", "parameterized"],
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
     "task_name": "BrowserDraw",
     "task_template": "Open the file task.html in Downloads in the file manager; when prompted open it with Chrome. Then create a drawing using the three colors shown at the top and hit submit.",
     "difficulty": "easy",
-    "tags": ["game_playing", "parameterized"],
+    "tags": [
+      "game_playing",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
@@ -37,63 +46,87 @@
     "task_name": "BrowserMultiply",
     "task_template": "Open the file task.html in Downloads in the file manager; when prompted open it with Chrome. Then click the button 5 times, remember the numbers displayed, and enter their product in the form.",
     "difficulty": "hard",
-    "tags": ["math_counting", "memorization", "screen_reading"],
+    "tags": [
+      "math_counting",
+      "memorization",
+      "screen_reading"
+    ],
     "optimal_steps": "11"
   },
   {
     "task_name": "CameraTakePhoto",
     "task_template": "Take one photo.",
     "difficulty": "easy",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "CameraTakeVideo",
     "task_template": "Take one video.",
     "difficulty": "medium",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "ClockStopWatchPausedVerify",
     "task_template": "Pause the stopwatch.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "1"
   },
   {
     "task_name": "ClockStopWatchRunning",
     "task_template": "Run the stopwatch.",
     "difficulty": "easy",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "ClockTimerEntry",
     "task_template": "Create a timer with {hours} hours, {minutes} minutes, and {seconds} seconds. Do not start the timer.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "ContactsAddContact",
     "task_template": "Create a new contact for {name}. Their number is {number}.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "ContactsNewContactDraft",
     "task_template": "Go to the new contact screen and enter the following details: First Name: {first}, Last Name: {last}, Phone: {phone}, Phone Label: {phone_label}. Do NOT hit save.",
     "difficulty": "easy",
-    "tags": ["screen_reading", "data_entry"],
+    "tags": [
+      "screen_reading",
+      "data_entry"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "ExpenseAddMultiple",
     "task_template": "Add the following expenses into the arduia pro expense: {expenses}",
     "difficulty": "medium",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "20"
   },
   {
@@ -127,140 +160,209 @@
     "task_name": "ExpenseAddSingle",
     "task_template": "Add the following expenses into the arduia pro expense: {expense}",
     "difficulty": "easy",
-    "tags": ["parameterized", "data_entry", "search"],
+    "tags": [
+      "parameterized",
+      "data_entry",
+      "search"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "ExpenseDeleteDuplicates",
     "task_template": "Delete all but one of any expenses in arduia pro expense that are exact duplicates, ensuring at least one instance of each unique expense remains.",
     "difficulty": "medium",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "ExpenseDeleteDuplicates2",
     "task_template": "Delete all but one of any expenses in arduia pro expense that are exact duplicates, ensuring at least one instance of each unique expense remains.",
     "difficulty": "medium",
-    "tags": ["data_edit", "requires_setup", "parameterized"],
+    "tags": [
+      "data_edit",
+      "requires_setup",
+      "parameterized"
+    ],
     "optimal_steps": "9"
   },
   {
     "task_name": "ExpenseDeleteMultiple",
     "task_template": "Delete the following expenses from arduia pro expense: {expenses}.",
     "difficulty": "easy",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
     "task_name": "ExpenseDeleteMultiple2",
     "task_template": "Delete the following expenses from arduia pro expense: {expenses}.",
     "difficulty": "hard",
-    "tags": ["screen_reading", "parameterized"],
+    "tags": [
+      "screen_reading",
+      "parameterized"
+    ],
     "optimal_steps": "17"
   },
   {
     "task_name": "ExpenseDeleteSingle",
     "task_template": "Delete the following expenses from arduia pro expense: {expense}.",
     "difficulty": "easy",
-    "tags": ["screen_reading", "parameterized"],
+    "tags": [
+      "screen_reading",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "FilesDeleteFile",
     "task_template": "Delete the file {file_name} from the Android filesystem located in the {subfolder} folder within the sdk_gphone_x86_64 storage area.",
     "difficulty": "medium",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "FilesMoveFile",
     "task_template": "Move the file {file_name} from {source_folder} within the sdk_gphone_x86_64 storage area to the {destination_folder} within the same sdk_gphone_x86_64 storage area in the Android filesystem.",
     "difficulty": "medium",
-    "tags": ["search", "screen_reading", "parameterized"],
+    "tags": [
+      "search",
+      "screen_reading",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
     "task_name": "MarkorAddNoteHeader",
     "task_template": "Update the Markor note {file_name} by adding the following text, along with a new blank line before the existing content: \"{header}\".",
     "difficulty": "medium",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "MarkorChangeNoteContent",
     "task_template": "Update the content of {file_name} to \"{updated_content}\" in Markor.",
     "difficulty": "medium",
-    "tags": ["data_entry", "requires_setup", "parameterized"],
+    "tags": [
+      "data_entry",
+      "requires_setup",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "MarkorCreateFolder",
     "task_template": "Create a new folder in Markor named {folder_name}.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "MarkorCreateNote",
     "task_template": "Create a new note in Markor named {file_name} with the following text: {text}",
     "difficulty": "medium",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "8"
   },
   {
     "task_name": "MarkorCreateNoteAndSms",
     "task_template": "Create a new note in Markor named {file_name} with the following text: {text}. Share the entire content of the note with the phone number {number} via SMS using Simple SMS Messenger",
     "difficulty": "hard",
-    "tags": ["multi_app", "data_entry", "parameterized"],
+    "tags": [
+      "multi_app",
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "9"
   },
   {
     "task_name": "MarkorCreateNoteFromClipboard",
     "task_template": "Create a note in Markor named {file_name}. Perform a paste operation in the note and save the note.",
     "difficulty": "medium",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "7"
   },
   {
     "task_name": "MarkorDeleteAllNotes",
     "task_template": "Delete all my notes in Markor.",
     "difficulty": "easy",
-    "tags": ["data_edit", "repetition", "parameterized"],
+    "tags": [
+      "data_edit",
+      "repetition",
+      "parameterized"
+    ],
     "optimal_steps": "7"
   },
   {
     "task_name": "MarkorDeleteNewestNote",
     "task_template": "Delete the newest note in Markor.",
     "difficulty": "easy",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "MarkorDeleteNote",
     "task_template": "Delete the note in Markor named {file_name}.",
     "difficulty": "easy",
-    "tags": ["data_edit", "requires_setup", "parameterized"],
+    "tags": [
+      "data_edit",
+      "requires_setup",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "MarkorEditNote",
     "task_template": "Edit {file_name} in Markor. Add to the top of the note {header}",
     "difficulty": "easy",
-    "tags": ["data_edit", "transcription", "parameterized"],
+    "tags": [
+      "data_edit",
+      "transcription",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "MarkorMergeNotes",
     "task_template": "Merge the contents of Markor notes {file1_name}, {file2_name} and {file3_name} (in the same order) into a new Markor note named {new_file_name} and save it. Add a new line between the content of each note.",
     "difficulty": "hard",
-    "tags": ["data_edit", "data_entry", "parameterized"],
+    "tags": [
+      "data_edit",
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "39"
   },
   {
     "task_name": "MarkorMoveNote",
     "task_template": "In Markor, move the note {file_name} from {source_folder} to {destination_folder}.",
     "difficulty": "medium",
-    "tags": ["parameterized", "complex_ui_understanding"],
+    "tags": [
+      "parameterized",
+      "complex_ui_understanding"
+    ],
     "optimal_steps": "7"
   },
   {
@@ -295,49 +397,72 @@
     "task_name": "NotesIsTodo",
     "task_template": "Is the note titled '{title}' in the Joplin app marked as a todo item? Respond with either 'True' if it is a todo or 'False' if not.",
     "difficulty": "easy",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "NotesMeetingAttendeeCount",
     "task_template": "How many attendees were present in the meeting titled '{title}' in the Joplin app? Express your answer as just a single number.",
     "difficulty": "easy",
-    "tags": ["search", "parameterized"],
+    "tags": [
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "NotesRecipeIngredientCount",
     "task_template": "What quantity of {ingredient} do I need for the recipe '{title}' in the Joplin app? Express your answer in the format <amount> <unit> without using abbreviations.",
     "difficulty": "easy",
-    "tags": ["search", "parameterized"],
+    "tags": [
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "NotesTodoItemCount",
     "task_template": "How many to-dos do I have in the '{folder}' folder in the Joplin app? Express your answer as just a single number.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "math_counting", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "math_counting",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "OpenAppTaskEval",
     "task_template": "Open the {app_name} app. Clear any pop-ups that may appear by granting all permissions that are required.",
     "difficulty": "easy",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "OsmAndFavorite",
     "task_template": "Add a favorite location marker for {location} in the OsmAnd maps app.",
     "difficulty": "medium",
-    "tags": ["search", "complex_ui_understanding", "parameterized"],
+    "tags": [
+      "search",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "OsmAndMarker",
     "task_template": "Add a location marker for {location} in the OsmAnd maps app.",
     "difficulty": "hard",
-    "tags": ["complex_ui_understanding", "search", "parameterized"],
+    "tags": [
+      "complex_ui_understanding",
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
@@ -357,7 +482,10 @@
     "task_name": "RecipeAddMultipleRecipes",
     "task_template": "Add the following recipes into the Broccoli app: {recipes}",
     "difficulty": "medium",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "34"
   },
   {
@@ -405,7 +533,10 @@
     "task_name": "RecipeAddSingleRecipe",
     "task_template": "Add the following recipes into the Broccoli app:\n{recipe}",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "12"
   },
   {
@@ -425,28 +556,42 @@
     "task_name": "RecipeDeleteDuplicateRecipes2",
     "task_template": "Delete all but one of any recipes in the Broccoli app that are exact duplicates, ensuring at least one instance of each unique recipe remains",
     "difficulty": "medium",
-    "tags": ["repetition", "data_edit", "parameterized"],
+    "tags": [
+      "repetition",
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "11"
   },
   {
     "task_name": "RecipeDeleteDuplicateRecipes3",
     "task_template": "Delete all but one of any recipes in the Broccoli app that are exact duplicates, ensuring at least one instance of each unique recipe remains",
     "difficulty": "medium",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "16"
   },
   {
     "task_name": "RecipeDeleteMultipleRecipes",
     "task_template": "Delete the following recipes from Broccoli app: {titles}.",
     "difficulty": "easy",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "12"
   },
   {
     "task_name": "RecipeDeleteMultipleRecipesWithConstraint",
     "task_template": "Delete the recipes from Broccoli app that use {ingredient} in the directions.",
     "difficulty": "hard",
-    "tags": ["screen_reading", "repetition", "parameterized"],
+    "tags": [
+      "screen_reading",
+      "repetition",
+      "parameterized"
+    ],
     "optimal_steps": "20"
   },
   {
@@ -465,28 +610,43 @@
     "task_name": "RecipeDeleteSingleRecipe",
     "task_template": "Delete the following recipes from Broccoli app: {titles}.",
     "difficulty": "easy",
-    "tags": ["data_edit", "search", "parameterized"],
+    "tags": [
+      "data_edit",
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "RecipeDeleteSingleWithRecipeWithNoise",
     "task_template": "Delete the following recipes from Broccoli app: {titles}.",
     "difficulty": "easy",
-    "tags": ["search", "screen_reading", "data_edit", "parameterized"],
+    "tags": [
+      "search",
+      "screen_reading",
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
     "task_name": "RetroCreatePlaylist",
     "task_template": "Create a playlist in Retro Music titled \"{playlist_name}\" with the following songs, in order: {names}",
     "difficulty": "medium",
-    "tags": ["data_entry", "repetition", "parameterized"],
+    "tags": [
+      "data_entry",
+      "repetition",
+      "parameterized"
+    ],
     "optimal_steps": "12"
   },
   {
     "task_name": "RetroPlayingQueue",
     "task_template": "Add the following songs, in order, {names} to my playing queue in Retro music.",
     "difficulty": "easy",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "16"
   },
   {
@@ -505,91 +665,135 @@
     "task_name": "RetroSavePlaylist",
     "task_template": "Create a playlist in Retro Music titled \"{playlist_name}\" with the following songs, in order: {names}. Then export the playlist to the Downloads directory on the device.",
     "difficulty": "hard",
-    "tags": ["search", "repetition", "parameterized"],
+    "tags": [
+      "search",
+      "repetition",
+      "parameterized"
+    ],
     "optimal_steps": "25"
   },
   {
     "task_name": "SaveCopyOfReceiptTaskEval",
     "task_template": "Copy {file_name} in DCIM and save a copy with the same name in Download",
     "difficulty": "hard",
-    "tags": ["parameterized", "complex_ui_understanding"],
+    "tags": [
+      "parameterized",
+      "complex_ui_understanding"
+    ],
     "optimal_steps": "8"
   },
   {
     "task_name": "SimpleCalendarAddOneEvent",
     "task_template": "In Simple Calendar Pro, create a calendar event on {year}-{month}-{day} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
     "difficulty": "hard",
-    "tags": ["data_entry", "complex_ui_understanding", "parameterized"],
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
     "optimal_steps": "17"
   },
   {
     "task_name": "SimpleCalendarAddOneEventInTwoWeeks",
     "task_template": "In Simple Calendar Pro, create a calendar event in two weeks from today at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
     "difficulty": "medium",
-    "tags": ["data_entry", "math_counting", "parameterized"],
+    "tags": [
+      "data_entry",
+      "math_counting",
+      "parameterized"
+    ],
     "optimal_steps": "10"
   },
   {
     "task_name": "SimpleCalendarAddOneEventRelativeDay",
     "task_template": "In Simple Calendar Pro, create a calendar event for this {day_of_week} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "17"
   },
   {
     "task_name": "SimpleCalendarAddOneEventTomorrow",
     "task_template": "In Simple Calendar Pro, create a calendar event for tomorrow at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "13"
   },
   {
     "task_name": "SimpleCalendarAddRepeatingEvent",
     "task_template": "In Simple Calendar Pro, create a recurring calendar event titled '{event_title}' starting on {year}-{month}-{day} at {hour}h. The event recurs {repeat_rule}, forever, and lasts for {duration_mins} minutes each occurrence. The event description should be '{event_description}'.",
     "difficulty": "easy",
-    "tags": ["data_entry", "complex_ui_understanding", "parameterized"],
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
     "optimal_steps": "14"
   },
   {
     "task_name": "SimpleCalendarAnyEventsOnDate",
     "task_template": "Do I have any events {date} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "easy",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "SimpleCalendarDeleteEvents",
     "task_template": "In Simple Calendar Pro, delete all the calendar events on {year}-{month}-{day}",
     "difficulty": "easy",
-    "tags": ["parameterized", "data_edit"],
+    "tags": [
+      "parameterized",
+      "data_edit"
+    ],
     "optimal_steps": "7"
   },
   {
     "task_name": "SimpleCalendarDeleteEventsOnRelativeDay",
     "task_template": "In Simple Calendar Pro, delete all events scheduled for this {day_of_week}.",
     "difficulty": "medium",
-    "tags": ["data_edit", "parameterized"],
+    "tags": [
+      "data_edit",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "SimpleCalendarDeleteOneEvent",
     "task_template": "In Simple Calendar Pro, delete the calendar event on {year}-{month}-{day} at {hour}h with the title '{event_title}'",
     "difficulty": "easy",
-    "tags": ["data_edit", "complex_ui_understanding", "parameterized"],
+    "tags": [
+      "data_edit",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "SimpleCalendarEventOnDateAtTime",
     "task_template": "What is on my schedule for {date} at {time} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SimpleCalendarEventsInNextWeek",
     "task_template": "What events do I have in the next week in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
@@ -610,21 +814,30 @@
     "task_name": "SimpleCalendarEventsOnDate",
     "task_template": "What events do I have {date} in Simple Calendar Pro? Answer with the titles only. If there are multiple titles, format your answer as a comma separated list.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "SimpleCalendarFirstEventAfterStartTime",
     "task_template": "What is my first event after {time} {date} in Simple Calendar Pro? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "easy",
-    "tags": ["parameterized", "screen_reading"],
+    "tags": [
+      "parameterized",
+      "screen_reading"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SimpleCalendarLocationOfEvent",
     "task_template": "What is the location of my {title} event in Simple Calendar Pro? Answer with the location only.",
     "difficulty": "easy",
-    "tags": ["search", "parameterized"],
+    "tags": [
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
@@ -643,63 +856,89 @@
     "task_name": "SimpleCalendarNextMeetingWithPerson",
     "task_template": "When is my next meeting with {person} in Simple Calendar Pro? Express your answer in the format <month name> <day> <year> <hour in 24-hour format>:<minutes>.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "SimpleDrawProCreateDrawing",
     "task_template": "Create a new drawing in Simple Draw Pro. Name it {file_name}. Save it in the Pictures folder within the sdk_gphone_x86_64 storage area.",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "9"
   },
   {
     "task_name": "SimpleSmsReply",
     "task_template": "Reply to {number} with message: {message} in Simple SMS Messenger",
     "difficulty": "easy",
-    "tags": ["search", "data_entry", "parameterized"],
+    "tags": [
+      "search",
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "SimpleSmsReplyMostRecent",
     "task_template": "Reply to the most recent text message using Simple SMS Messenger with message: {message}",
     "difficulty": "medium",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "SimpleSmsResend",
     "task_template": "Resend the message I just sent to {name} in Simple SMS Messenger",
     "difficulty": "medium",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "SimpleSmsSend",
     "task_template": "Send a text message using Simple SMS Messenger to {number} with message: {message}",
     "difficulty": "medium",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "SimpleSmsSendClipboardContent",
     "task_template": "Send a message to {number} with the clipboard content in Simple SMS Messenger",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "SimpleSmsSendReceivedAddress",
     "task_template": "Text the address of the event to {name1} that {name2} just sent me in Simple SMS Messenger",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "9"
   },
   {
     "task_name": "SportsTrackerActivitiesCountForWeek",
     "task_template": "How many {category} activities did I do this week in the OpenTracks app? Express your answer as a single integer.",
     "difficulty": "easy",
-    "tags": ["search", "requires_setup", "parameterized"],
+    "tags": [
+      "search",
+      "requires_setup",
+      "parameterized"
+    ],
     "optimal_steps": "3"
   },
   {
@@ -720,7 +959,10 @@
     "task_name": "SportsTrackerActivityDuration",
     "task_template": "How long was my {category} activity {date} in the OpenTracks app? Express your answer in minutes as a single integer.",
     "difficulty": "easy",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
@@ -739,126 +981,171 @@
     "task_name": "SportsTrackerTotalDistanceForCategoryOverInterval",
     "task_template": "What was the total distance covered for {category} activities in the OpenTracks app from {start_date} to {end_date}? Express your answer in meters as a single integer.",
     "difficulty": "hard",
-    "tags": ["search", "parameterized", "math_counting"],
+    "tags": [
+      "search",
+      "parameterized",
+      "math_counting"
+    ],
     "optimal_steps": "11"
   },
   {
     "task_name": "SportsTrackerTotalDurationForCategoryThisWeek",
     "task_template": "What was the total duration of {category} activities in the OpenTracks app this week? Express your answer in minutes as a single integer.",
     "difficulty": "hard",
-    "tags": ["math_counting", "search", "parameterized"],
+    "tags": [
+      "math_counting",
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "8"
   },
   {
     "task_name": "SystemBluetoothTurnOff",
     "task_template": "Turn bluetooth {on_or_off}.",
     "difficulty": "easy",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemBluetoothTurnOffVerify",
     "task_template": "Turn bluetooth {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemBluetoothTurnOn",
     "task_template": "Turn bluetooth {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["screen_reading"],
+    "tags": [
+      "screen_reading"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemBluetoothTurnOnVerify",
     "task_template": "Turn bluetooth {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemBrightnessMax",
     "task_template": "Turn brightness to the {max_or_min} value.",
     "difficulty": "easy",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemBrightnessMaxVerify",
     "task_template": "Turn brightness to the {max_or_min} value.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemBrightnessMin",
     "task_template": "Turn brightness to the {max_or_min} value.",
     "difficulty": "easy",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemBrightnessMinVerify",
     "task_template": "Turn brightness to the {max_or_min} value.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemCopyToClipboard",
     "task_template": "Copy the following text to the clipboard: {clipboard_content}",
     "difficulty": "easy",
-    "tags": ["data_entry", "parameterized"],
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "SystemWifiTurnOff",
     "task_template": "Turn wifi {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["screen_reading"],
+    "tags": [
+      "screen_reading"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemWifiTurnOffVerify",
     "task_template": "Turn wifi {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemWifiTurnOn",
     "task_template": "Turn wifi {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["screen_reading"],
+    "tags": [
+      "screen_reading"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "SystemWifiTurnOnVerify",
     "task_template": "Turn wifi {on_or_off}.",
     "difficulty": "easy",
-    "tags": ["verification"],
+    "tags": [
+      "verification"
+    ],
     "optimal_steps": "3"
   },
   {
     "task_name": "TasksCompletedTasksForDate",
     "task_template": "Which tasks have I completed for {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "search", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "TasksDueNextWeek",
     "task_template": "How many tasks do I have due next week in Tasks app? Express your answer as a single integer.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "parameterized"
+    ],
     "optimal_steps": "6"
   },
   {
     "task_name": "TasksDueOnDate",
     "task_template": "What tasks do I have due {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "easy",
-    "tags": ["search", "parameterized"],
+    "tags": [
+      "search",
+      "parameterized"
+    ],
     "optimal_steps": "2"
   },
   {
@@ -878,42 +1165,250 @@
     "task_name": "TasksHighPriorityTasksDueOnDate",
     "task_template": "Which tasks with high priority are due {date} in the Tasks app? Answer with the title only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "medium",
-    "tags": ["information_retrieval", "screen_reading", "parameterized"],
+    "tags": [
+      "information_retrieval",
+      "screen_reading",
+      "parameterized"
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "TasksIncompleteTasksOnDate",
     "task_template": "What incomplete tasks do I have still have to do by {date} in Tasks app? Answer with the titles only. If there are multiples titles, format your answer in a comma separated list.",
     "difficulty": "easy",
-    "tags": ["parameterized", "screen_reading", "information_retrieval"],
+    "tags": [
+      "parameterized",
+      "screen_reading",
+      "information_retrieval"
+    ],
     "optimal_steps": "2"
   },
   {
     "task_name": "TurnOffWifiAndTurnOnBluetooth",
     "task_template": "Turn off WiFi, then enable bluetooth",
     "difficulty": "medium",
-    "tags": [""],
+    "tags": [
+      ""
+    ],
     "optimal_steps": "5"
   },
   {
     "task_name": "TurnOnWifiAndOpenApp",
     "task_template": "Turn on Wifi, then open the {app_name} app",
     "difficulty": "easy",
-    "tags": ["parameterized"],
+    "tags": [
+      "parameterized"
+    ],
     "optimal_steps": "4"
   },
   {
     "task_name": "VlcCreatePlaylist",
     "task_template": "Create a playlist titled \"{playlist_name}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: {files}",
     "difficulty": "medium",
-    "tags": ["data_edit", "repetition", "parameterized"],
+    "tags": [
+      "data_edit",
+      "repetition",
+      "parameterized"
+    ],
     "optimal_steps": "14"
   },
   {
     "task_name": "VlcCreateTwoPlaylists",
     "task_template": "Create a playlist titled \"{playlist_name1}\" with the following files in VLC, in order: {files1}. And then, Create a playlist titled \"{playlist_name2}\" with the following files in VLC (located in Internal Memory/VLCVideos), in order: {files1}",
     "difficulty": "medium",
-    "tags": ["data_entry", "requires_setup", "parameterized"],
+    "tags": [
+      "data_entry",
+      "requires_setup",
+      "parameterized"
+    ],
     "optimal_steps": "24"
+  },
+  {
+    "task_name": "MarkorAppendToNote",
+    "task_template": "Open the Markor note {file_name} and add this text as a new line at the bottom: \"{appended_text}\".",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "data_entry",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "5"
+  },
+  {
+    "task_name": "MarkorCopyNote",
+    "task_template": "In Markor, copy the contents of {source_name} into a new note named {new_name}. Leave the original note unchanged.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "data_edit",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "8"
+  },
+  {
+    "task_name": "MarkorCreateChecklistNote",
+    "task_template": "Create a checklist note in Markor named {file_name} with these items: {items}. Each checklist item should be unchecked.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
+    "optimal_steps": "10"
+  },
+  {
+    "task_name": "MarkorCreateNoteInFolder",
+    "task_template": "In Markor, create a note named {file_name} inside the {folder_name} folder with the following text: {text}",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "10"
+  },
+  {
+    "task_name": "MarkorDeleteNoteInFolder",
+    "task_template": "In Markor, delete the note {file_name} from the {subfolder} folder.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "complex_ui_understanding",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "7"
+  },
+  {
+    "task_name": "MarkorPrependDateToNote",
+    "task_template": "Open the Markor note {file_name} and add {date} as the first line of the note.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "data_entry",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "5"
+  },
+  {
+    "task_name": "MarkorRenameNote",
+    "task_template": "Rename the Markor note {original_name} to {new_name} without changing its contents.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "5"
+  },
+  {
+    "task_name": "MarkorReplaceTextInNote",
+    "task_template": "In the Markor note {file_name}, replace the text \"{old_text}\" with \"{new_text}\".",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "data_entry",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "5"
+  },
+  {
+    "task_name": "SimpleCalendarAddEventNextWeek",
+    "task_template": "In Simple Calendar Pro, create a calendar event for next {day_of_week} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "math_counting",
+      "parameterized"
+    ],
+    "optimal_steps": "13"
+  },
+  {
+    "task_name": "SimpleCalendarAddEventWithLocation",
+    "task_template": "In Simple Calendar Pro, create a calendar event on {year}-{month}-{day} at {hour}h located at '{location}' with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "19"
+  },
+  {
+    "task_name": "SimpleCalendarAddLongEvent",
+    "task_template": "In Simple Calendar Pro, create a long calendar event on {year}-{month}-{day} at {hour}h with the title '{event_title}' and the description '{event_description}'. The event should last for {duration_mins} mins.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "complex_ui_understanding",
+      "parameterized"
+    ],
+    "optimal_steps": "18"
+  },
+  {
+    "task_name": "SimpleCalendarAddTwoEventsDifferentDays",
+    "task_template": "In Simple Calendar Pro, create two calendar events: one on {year}-{month}-{day1} at {hour1}h titled '{event_title1}' with description '{event_description1}' lasting {duration_mins1} mins, and one on {year}-{month}-{day2} at {hour2}h titled '{event_title2}' with description '{event_description2}' lasting {duration_mins2} mins.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "repetition",
+      "parameterized"
+    ],
+    "optimal_steps": "32"
+  },
+  {
+    "task_name": "SimpleCalendarAddTwoEventsSameDay",
+    "task_template": "In Simple Calendar Pro, create two calendar events on {year}-{month}-{day}: first at {hour1}h titled '{event_title1}' with description '{event_description1}' lasting {duration_mins1} mins, and second at {hour2}h titled '{event_title2}' with description '{event_description2}' lasting {duration_mins2} mins.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "repetition",
+      "parameterized"
+    ],
+    "optimal_steps": "30"
+  },
+  {
+    "task_name": "SimpleCalendarDeleteEventByTitle",
+    "task_template": "In Simple Calendar Pro, delete the calendar event titled '{event_title}'.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "search",
+      "complex_ui_understanding",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "6"
+  },
+  {
+    "task_name": "SimpleCalendarDeleteEventByTitleAndDate",
+    "task_template": "In Simple Calendar Pro, delete the calendar event titled '{event_title}' on {year}-{month}-{day}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "search",
+      "complex_ui_understanding",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "7"
+  },
+  {
+    "task_name": "SimpleCalendarDeleteTomorrowEvents",
+    "task_template": "In Simple Calendar Pro, delete all calendar events for tomorrow.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "math_counting",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "6"
   }
 ]

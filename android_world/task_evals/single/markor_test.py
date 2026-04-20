@@ -227,6 +227,161 @@ class TestMarkorCreateNoteFromClipboard(test_utils.AdbEvalTestBase):
     )
 
 
+class TestMarkorCreateNoteInFolder(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    note_content = adb_pb2.AdbResponse()
+    note_content.generic.output = b'folder note content'
+    self.mock_check_file_or_folder_exists.return_value = True
+    self.mock_issue_generic_request.return_value = note_content
+
+    task = markor.MarkorCreateNoteInFolder({
+        'folder_name': 'DailyNotes',
+        'file_name': 'daily_note.md',
+        'text': 'folder note content',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_mkdir.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorCreateChecklistNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    checklist_content = adb_pb2.AdbResponse()
+    checklist_content.generic.output = b'- [ ] Book tickets\n- [ ] Pack bag'
+    self.mock_check_file_or_folder_exists.return_value = True
+    self.mock_issue_generic_request.return_value = checklist_content
+
+    task = markor.MarkorCreateChecklistNote({
+        'file_name': 'checklist.md',
+        'items': 'Book tickets, Pack bag',
+        'text': '- [ ] Book tickets\n- [ ] Pack bag',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+
+
+class TestMarkorAppendToNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    updated_content = adb_pb2.AdbResponse()
+    updated_content.generic.output = b'Original Content\nAppended Content'
+    self.mock_check_file_or_folder_exists.return_value = True
+    self.mock_issue_generic_request.return_value = updated_content
+
+    task = markor.MarkorAppendToNote({
+        'file_name': 'test_note.md',
+        'original_content': 'Original Content',
+        'appended_text': 'Appended Content',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorCopyNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    copied_content = adb_pb2.AdbResponse()
+    copied_content.generic.output = b'Copy this content'
+    self.mock_check_file_or_folder_exists.return_value = True
+    self.mock_issue_generic_request.return_value = copied_content
+
+    task = markor.MarkorCopyNote({
+        'source_name': 'source.md',
+        'new_name': 'copy.md',
+        'content': 'Copy this content',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorDeleteNoteInFolder(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    self.mock_check_file_or_folder_exists.side_effect = [True, False]
+
+    task = markor.MarkorDeleteNoteInFolder({
+        'file_name': 'archive_note.md',
+        'subfolder': 'DailyNotes',
+        'noise_candidates': ['other_note.md'],
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorPrependDateToNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    updated_content = adb_pb2.AdbResponse()
+    updated_content.generic.output = b'2023-10-15\nOriginal Content'
+    self.mock_issue_generic_request.return_value = updated_content
+
+    task = markor.MarkorPrependDateToNote({
+        'file_name': 'dated_note.md',
+        'date': '2023-10-15',
+        'original_content': 'Original Content',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorRenameNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    renamed_content = adb_pb2.AdbResponse()
+    renamed_content.generic.output = b'Original Content'
+    self.mock_check_file_or_folder_exists.side_effect = [False, True]
+    self.mock_issue_generic_request.return_value = renamed_content
+
+    task = markor.MarkorRenameNote({
+        'original_name': 'old_note.md',
+        'new_name': 'new_note.md',
+        'original_content': 'Original Content',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
+class TestMarkorReplaceTextInNote(test_utils.AdbEvalTestBase):
+
+  def test_is_successful(self):
+    env = mock.create_autospec(interface.AsyncEnv)
+    updated_content = adb_pb2.AdbResponse()
+    updated_content.generic.output = b'Status: confirmed'
+    self.mock_issue_generic_request.return_value = updated_content
+
+    task = markor.MarkorReplaceTextInNote({
+        'file_name': 'status.md',
+        'old_text': 'pending',
+        'new_text': 'confirmed',
+        'original_content': 'Status: pending',
+        'updated_content': 'Status: confirmed',
+    })
+
+    self.assertEqual(test_utils.perform_task(task, env), 1)
+    self.mock_create_file.assert_called()
+    self.mock_create_random_files.assert_called()
+
+
 class TestMarkorMergeNotes(test_utils.AdbEvalTestBase):
 
   def test_initialized_correctly(self):
