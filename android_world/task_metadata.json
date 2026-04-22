@@ -1413,7 +1413,7 @@
   },
   {
     "task_name": "ContactsAddClipboardContact",
-    "task_template": "In Contacts, create a new contact using the clipboard details. The contact name should be {name} and the number should be {number}.",
+    "task_template": "In Contacts, create a new contact using the name and phone number currently in the clipboard.",
     "difficulty": "medium",
     "tags": [
       "data_entry",

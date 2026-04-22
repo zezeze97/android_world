@@ -260,8 +260,8 @@ _SPECS = [
     (
         "ContactsAddClipboardContact",
         contacts.ContactsAddClipboardContact,
-        "In Contacts, create a new contact using the clipboard details. The"
-        " contact name should be {name} and the number should be {number}.",
+        "In Contacts, create a new contact using the name and phone number"
+        " currently in the clipboard.",
         "medium",
         ["data_entry", "cross_app", "parameterized"],
         "7",
