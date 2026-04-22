@@ -1410,5 +1410,188 @@
       "parameterized"
     ],
     "optimal_steps": "6"
+  },
+  {
+    "task_name": "ContactsAddClipboardContact",
+    "task_template": "In Contacts, create a new contact using the clipboard details. The contact name should be {name} and the number should be {number}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "cross_app",
+      "parameterized"
+    ],
+    "optimal_steps": "7"
+  },
+  {
+    "task_name": "ContactsAddEmergencyContact",
+    "task_template": "In Contacts, add the emergency contact described in the latest text message from {sender_number}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "information_extraction",
+      "requires_setup"
+    ],
+    "optimal_steps": "9"
+  },
+  {
+    "task_name": "ContactsAddFromIncomingSms",
+    "task_template": "In Contacts, add the person and phone number described in the latest text message from {sender_number}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "information_extraction",
+      "requires_setup"
+    ],
+    "optimal_steps": "9"
+  },
+  {
+    "task_name": "ContactsAddFromMarkorNote",
+    "task_template": "In Markor, open contacts_to_add.txt and add the contact listed for {role} to Contacts.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "cross_app",
+      "information_extraction",
+      "requires_setup"
+    ],
+    "optimal_steps": "13"
+  },
+  {
+    "task_name": "ExpenseAddFoodPurchase",
+    "task_template": "In Pro Expense, add this {category} expense: name {expense_name}, amount {amount}, note {note}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
+    "optimal_steps": "9"
+  },
+  {
+    "task_name": "ExpenseAddHighValueExpensesFromMarkor",
+    "task_template": "In Markor, open expense_candidates.txt. Add only the expenses with amount at least {min_amount} into Pro Expense.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "cross_app",
+      "information_extraction",
+      "requires_setup"
+    ],
+    "optimal_steps": "28"
+  },
+  {
+    "task_name": "ExpenseAddTwoEducationExpenses",
+    "task_template": "In Pro Expense, add these two Education expenses:\n{expense_summary}",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "repetition",
+      "parameterized"
+    ],
+    "optimal_steps": "18"
+  },
+  {
+    "task_name": "ExpenseDeleteEntertainmentExpenses",
+    "task_template": "In Pro Expense, delete all {category} expenses and leave the other expenses unchanged.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "search",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "12"
+  },
+  {
+    "task_name": "RecipeAddRecipesFromMarkorWithIngredient",
+    "task_template": "In Markor, open recipe_candidates.txt. Add only the recipes whose directions mention {ingredient} into Broccoli app.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "cross_app",
+      "information_extraction",
+      "requires_setup"
+    ],
+    "optimal_steps": "32"
+  },
+  {
+    "task_name": "RecipeAddThirtyMinuteRecipe",
+    "task_template": "In Broccoli app, add the recipe {recipe_title}. Description: {description}. Servings: {servings}. Preparation time: {prep_time}. Ingredients: {ingredients}. Directions: {directions}.",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "parameterized"
+    ],
+    "optimal_steps": "18"
+  },
+  {
+    "task_name": "RecipeAddTwoFamilyServingRecipes",
+    "task_template": "In Broccoli app, add these two recipes that each make {servings}:\n{recipe_summary}",
+    "difficulty": "hard",
+    "tags": [
+      "data_entry",
+      "repetition",
+      "parameterized"
+    ],
+    "optimal_steps": "32"
+  },
+  {
+    "task_name": "RecipeDeleteThirtyMinuteRecipes",
+    "task_template": "In Broccoli app, delete every recipe with preparation time {prep_time}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_edit",
+      "search",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "12"
+  },
+  {
+    "task_name": "SimpleSmsForwardSecurityCode",
+    "task_template": "In Simple SMS Messenger, forward the security code from {sender_name} to {recipient_name}. Send only the code.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "information_extraction",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "10"
+  },
+  {
+    "task_name": "SimpleSmsForwardTrackingNumber",
+    "task_template": "In Simple SMS Messenger, forward the package tracking number from {sender_name} to {recipient_name}. Send only the tracking number.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "information_extraction",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "10"
+  },
+  {
+    "task_name": "SimpleSmsSendToSavedContact",
+    "task_template": "In Simple SMS Messenger, send {message} to the saved contact {name}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "search",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "8"
+  },
+  {
+    "task_name": "SimpleSmsTextClipboardToSavedContact",
+    "task_template": "In Simple SMS Messenger, send the clipboard content to the saved contact {name}.",
+    "difficulty": "medium",
+    "tags": [
+      "data_entry",
+      "cross_app",
+      "requires_setup",
+      "parameterized"
+    ],
+    "optimal_steps": "9"
   }
 ]

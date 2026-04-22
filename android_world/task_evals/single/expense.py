@@ -396,6 +396,129 @@ class ExpenseAddMultipleFromGallery(_ExpenseAddMultiple):
     user_data_generation.clear_device_storage(env)
 
 
+class ExpenseAddFoodPurchase(_ExpenseAddMultiple):
+  """Task to add a single Food-category expense."""
+
+  complexity = 1.4
+  n_rows = 1
+  n_rows_noise = 8
+
+  @classmethod
+  def _get_random_target_row(cls) -> sqlite_schema_utils.Expense:
+    return _generate_expense(category_id=3)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    params = super().generate_random_params()
+    target = params[sqlite_validators.ROW_OBJECTS][0]
+    params.update({
+        'expense_name': target.name,
+        'amount': target.amount_dollars,
+        'category': target.category_name,
+        'note': target.note,
+    })
+    return params
+
+
+class ExpenseAddTwoEducationExpenses(_ExpenseAddMultiple):
+  """Task to add two Education-category expenses."""
+
+  complexity = 3
+  n_rows = 2
+  n_rows_noise = 10
+
+  @classmethod
+  def _get_random_target_row(cls) -> sqlite_schema_utils.Expense:
+    return _generate_expense(category_id=10)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    params = super().generate_random_params()
+    params['expense_summary'] = _get_expense_rows_as_text(
+        params[sqlite_validators.ROW_OBJECTS], 'text_block'
+    )
+    return params
+
+
+class ExpenseDeleteEntertainmentExpenses(_ExpenseDeleteMultiple):
+  """Task to delete only Entertainment expenses among other expenses."""
+
+  complexity = 2.6
+  n_rows = 2
+  n_rows_noise = 18
+  target_category_id = 6
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    target_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows,
+        lambda: _generate_expense(category_id=cls.target_category_id),
+        replacement=False,
+    )
+    noise_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows_noise,
+        _generate_expense,
+        replacement=False,
+        filter_fn=lambda row: row.category != cls.target_category_id,
+    )
+    return {
+        sqlite_validators.ROW_OBJECTS: target_rows,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_rows,
+        'category': sqlite_schema_utils.Expense.category_id_to_name[
+            cls.target_category_id
+        ],
+    }
+
+
+class ExpenseAddHighValueExpensesFromMarkor(_ExpenseAddMultiple):
+  """Task to add expenses over a threshold from a Markor note."""
+
+  complexity = 6
+  n_rows = 2
+  n_rows_noise = 30
+  min_amount_cents = 20000
+  app_names = (_APP_NAME, 'markor')
+
+  def initialize_task(self, env: interface.AsyncEnv):
+    super().initialize_task(env)
+    rows = (
+        self.params[sqlite_validators.ROW_OBJECTS]
+        + self.params[sqlite_validators.NOISE_ROW_OBJECTS]
+    )
+    random.shuffle(rows)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+    user_data_generation.write_to_markor(
+        _get_expense_rows_as_text(rows, 'csv'),
+        'expense_candidates.txt',
+        env,
+    )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    target_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows,
+        _generate_expense,
+        replacement=False,
+        filter_fn=lambda row: row.amount >= cls.min_amount_cents,
+    )
+    noise_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows_noise,
+        _generate_expense,
+        replacement=False,
+        filter_fn=lambda row: row.amount < cls.min_amount_cents,
+    )
+    return {
+        sqlite_validators.ROW_OBJECTS: target_rows,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_rows,
+        _TEXT_REPRESENTATION_TYPE: 'csv',
+        'min_amount': f'${cls.min_amount_cents / 100:.2f}',
+    }
+
+
 #### Generate expense data for tasks. ##########################################
 
 

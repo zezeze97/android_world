@@ -17,11 +17,16 @@
 import random
 import re
 from absl import logging
+from android_world.env import adb_utils
+from android_world.env import device_constants
 from android_world.env import interface
 from android_world.env import representation_utils
 from android_world.task_evals import task_eval
 from android_world.task_evals.common_validators import contacts_validators
+from android_world.task_evals.common_validators import sms_validators
+from android_world.task_evals.utils import user_data_generation
 from android_world.utils import fuzzy_match_lib
+from android_world.utils import file_utils
 
 
 class ContactsAddContact(contacts_validators.AddContact):
@@ -223,3 +228,142 @@ class ContactsNewContactDraft(task_eval.TaskEval):
         )
         else 0.0
     )
+
+
+class ContactsAddFromIncomingSms(contacts_validators.AddContact):
+  """Task for adding a contact whose details arrived in a text message."""
+
+  app_names = ("contacts", "simple sms messenger")
+  complexity = 1.8
+  schema = {
+      "type": "object",
+      "properties": {
+          "name": {"type": "string"},
+          "number": {"type": "string"},
+          "sender_number": {"type": "string"},
+      },
+      "required": ["name", "number", "sender_number"],
+  }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    sms_validators.clear_sms_and_threads(env.controller)
+    adb_utils.disable_headsup_notifications(env.controller)
+    adb_utils.text_emulator(
+        env.controller,
+        self.params["sender_number"],
+        (
+            f"Please add {self.params['name']} to contacts. Their number is"
+            f" {self.params['number']}."
+        ),
+    )
+    adb_utils.enable_headsup_notifications(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "sender_number": user_data_generation.generate_random_number(),
+    }
+
+
+class ContactsAddFromMarkorNote(contacts_validators.AddContact):
+  """Task for adding one requested contact from a Markor note."""
+
+  app_names = ("contacts", "markor")
+  complexity = 2
+  schema = {
+      "type": "object",
+      "properties": {
+          "name": {"type": "string"},
+          "number": {"type": "string"},
+          "role": {"type": "string"},
+      },
+      "required": ["name", "number", "role"],
+  }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+    rows = [
+        ("backup", user_data_generation.generate_random_name(),
+         user_data_generation.generate_random_number()),
+        (self.params["role"], self.params["name"], self.params["number"]),
+        ("billing", user_data_generation.generate_random_name(),
+         user_data_generation.generate_random_number()),
+    ]
+    random.shuffle(rows)
+    text = "\n".join(
+        f"role: {role}; name: {name}; number: {number}"
+        for role, name, number in rows
+    )
+    user_data_generation.write_to_markor(text, "contacts_to_add.txt", env)
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "role": random.choice(["travel coordinator", "clinic", "landlord"]),
+    }
+
+
+class ContactsAddClipboardContact(contacts_validators.AddContact):
+  """Task for adding a contact from clipboard text."""
+
+  app_names = ("contacts", "clipper")
+  complexity = 1.6
+  schema = contacts_validators.AddContact.schema
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    adb_utils.set_clipboard_contents(
+        f"{self.params['name']} | {self.params['number']}", env.controller
+    )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return contacts_validators.AddContact.generate_random_params()
+
+
+class ContactsAddEmergencyContact(contacts_validators.AddContact):
+  """Task for adding an emergency contact described in a text message."""
+
+  app_names = ("contacts", "simple sms messenger")
+  complexity = 1.2
+  schema = {
+      "type": "object",
+      "properties": {
+          "name": {"type": "string"},
+          "number": {"type": "string"},
+          "sender_number": {"type": "string"},
+      },
+      "required": ["name", "number", "sender_number"],
+  }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    sms_validators.clear_sms_and_threads(env.controller)
+    adb_utils.disable_headsup_notifications(env.controller)
+    adb_utils.text_emulator(
+        env.controller,
+        self.params["sender_number"],
+        (
+            f"Emergency contact: {self.params['name']},"
+            f" {self.params['number']}."
+        ),
+    )
+    adb_utils.enable_headsup_notifications(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "sender_number": user_data_generation.generate_random_number(),
+    }

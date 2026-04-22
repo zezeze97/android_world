@@ -311,3 +311,159 @@ class SimpleSmsResend(sms_validators.SimpleSMSSendSms):
   def tear_down(self, env: interface.AsyncEnv):
     super().tear_down(env)
     adb_utils.delete_contacts(env.controller)
+
+
+class SimpleSmsSendToSavedContact(sms_validators.SimpleSMSSendSms):
+  """Task for sending a message to an existing contact by name."""
+
+  complexity = 1.4
+  schema = {
+      "type": "object",
+      "properties": {
+          "name": {"type": "string"},
+          "number": {"type": "string"},
+          "message": {"type": "string"},
+      },
+      "required": ["name", "number", "message"],
+  }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    contacts_utils.add_contact(
+        self.params["name"], self.params["number"], env.controller
+    )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return {
+        "name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "message": random.choice(sms_validators.SimpleSMSSendSms.messages),
+    }
+
+
+class SimpleSmsForwardSecurityCode(sms_validators.SimpleSMSSendSms):
+  """Task for forwarding a received security code to a saved contact."""
+
+  complexity = 2
+  schema = {
+      "type": "object",
+      "properties": {
+          "recipient_name": {"type": "string"},
+          "number": {"type": "string"},
+          "sender_name": {"type": "string"},
+          "sender_number": {"type": "string"},
+          "code": {"type": "string"},
+          "message": {"type": "string"},
+      },
+      "required": [
+          "recipient_name",
+          "number",
+          "sender_name",
+          "sender_number",
+          "code",
+          "message",
+      ],
+  }
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    adb_utils.disable_headsup_notifications(env.controller)
+    super().initialize_task(env)
+    contacts_utils.add_contact(
+        self.params["recipient_name"], self.params["number"], env.controller
+    )
+    contacts_utils.add_contact(
+        self.params["sender_name"], self.params["sender_number"], env.controller
+    )
+    adb_utils.text_emulator(
+        env.controller,
+        self.params["sender_number"],
+        f"Your security code is {self.params['code']}. It expires soon.",
+    )
+    time.sleep(1)
+    adb_utils.enable_headsup_notifications(env.controller)
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    code = str(random.randint(100000, 999999))
+    return {
+        "recipient_name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "sender_name": "Secure Login",
+        "sender_number": user_data_generation.generate_random_number(),
+        "code": code,
+        "message": code,
+    }
+
+
+class SimpleSmsTextClipboardToSavedContact(
+    sms_validators.SimpleSMSSendSms
+):
+  """Task for sending clipboard text to a saved contact."""
+
+  app_names = ("simple sms messenger", "contacts", "clipper")
+  complexity = 1.8
+  schema = SimpleSmsSendToSavedContact.schema
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    super().initialize_task(env)
+    contacts_utils.add_contact(
+        self.params["name"], self.params["number"], env.controller
+    )
+    adb_utils.set_clipboard_contents(self.params["message"], env.controller)
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    return SimpleSmsSendToSavedContact.generate_random_params()
+
+
+class SimpleSmsForwardTrackingNumber(sms_validators.SimpleSMSSendSms):
+  """Task for forwarding a received tracking number to a saved contact."""
+
+  complexity = 2
+  schema = SimpleSmsForwardSecurityCode.schema
+
+  def initialize_task(self, env: interface.AsyncEnv) -> None:
+    adb_utils.disable_headsup_notifications(env.controller)
+    super().initialize_task(env)
+    contacts_utils.add_contact(
+        self.params["recipient_name"], self.params["number"], env.controller
+    )
+    adb_utils.text_emulator(
+        env.controller,
+        self.params["sender_number"],
+        (
+            f"Package update: tracking number {self.params['code']} is ready"
+            " for pickup."
+        ),
+    )
+    time.sleep(1)
+    adb_utils.enable_headsup_notifications(env.controller)
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    adb_utils.delete_contacts(env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, str | int]:
+    tracking = f"PKG{random.randint(1000000, 9999999)}"
+    return {
+        "recipient_name": user_data_generation.generate_random_name(),
+        "number": user_data_generation.generate_random_number(),
+        "sender_name": "Parcel Desk",
+        "sender_number": user_data_generation.generate_random_number(),
+        "code": tracking,
+        "message": tracking,
+    }

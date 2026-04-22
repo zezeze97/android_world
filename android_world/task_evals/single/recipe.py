@@ -543,6 +543,145 @@ class RecipeAddMultipleRecipesFromImage(_RecipeAddMultipleRecipes):
     super().tear_down(env)
     user_data_generation.clear_device_storage(env)
 
+
+class RecipeAddThirtyMinuteRecipe(_RecipeAddMultipleRecipes):
+  """Task to add one recipe with a 30-minute preparation time."""
+
+  complexity = 2.6
+  n_rows = 1
+  n_rows_noise = 10
+  target_prep_time = '30 mins'
+
+  @classmethod
+  def _get_random_target_row(cls) -> sqlite_schema_utils.Recipe:
+    return dataclasses.replace(
+        _generate_random_recipe(), preparationTime=cls.target_prep_time
+    )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    params = super().generate_random_params()
+    target = params[sqlite_validators.ROW_OBJECTS][0]
+    params.update({
+        'recipe_title': target.title,
+        'description': target.description,
+        'servings': target.servings,
+        'prep_time': target.preparationTime,
+        'ingredients': target.ingredients,
+        'directions': target.directions,
+    })
+    return params
+
+
+class RecipeAddTwoFamilyServingRecipes(_RecipeAddMultipleRecipes):
+  """Task to add two recipes with the same servings field."""
+
+  complexity = 4
+  n_rows = 2
+  n_rows_noise = 12
+  target_servings = '6 servings'
+
+  @classmethod
+  def _get_random_target_row(cls) -> sqlite_schema_utils.Recipe:
+    return dataclasses.replace(
+        _generate_random_recipe(), servings=cls.target_servings
+    )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    params = super().generate_random_params()
+    params['servings'] = cls.target_servings
+    params['recipe_summary'] = _get_rows_as_text(
+        params[sqlite_validators.ROW_OBJECTS],
+        params[_TEXT_REPRESENTATION_TYPE],
+    )
+    return params
+
+
+class RecipeDeleteThirtyMinuteRecipes(_RecipeDeleteMultipleRecipes):
+  """Task to delete recipes with a specified preparation time."""
+
+  complexity = 3
+  n_rows = 2
+  n_rows_noise = 24
+  target_prep_time = '30 mins'
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    target_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows,
+        _generate_random_recipe,
+        replacement=False,
+        filter_fn=lambda row: row.preparationTime == cls.target_prep_time,
+    )
+    noise_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows_noise,
+        _generate_random_recipe,
+        replacement=False,
+        filter_fn=lambda row: row.preparationTime != cls.target_prep_time,
+    )
+    return {
+        sqlite_validators.ROW_OBJECTS: target_rows,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_rows,
+        'prep_time': cls.target_prep_time,
+    }
+
+
+class RecipeAddRecipesFromMarkorWithIngredient(_RecipeAddMultipleRecipes):
+  """Task to add recipes mentioning a specific ingredient from Markor."""
+
+  complexity = 6
+  n_rows = 2
+  n_rows_noise = 28
+  app_names = (_APP_NAME, 'markor')
+
+  def initialize_task(self, env: interface.AsyncEnv):
+    super().initialize_task(env)
+    rows = (
+        self.params[sqlite_validators.ROW_OBJECTS]
+        + self.params[sqlite_validators.NOISE_ROW_OBJECTS]
+    )
+    random.shuffle(rows)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+    user_data_generation.write_to_markor(
+        _get_rows_as_text(rows, self.params[_TEXT_REPRESENTATION_TYPE]),
+        'recipe_candidates.txt',
+        env,
+    )
+
+  def tear_down(self, env: interface.AsyncEnv):
+    super().tear_down(env)
+    file_utils.clear_directory(device_constants.MARKOR_DATA, env.controller)
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    ingredient = random.choice([
+        'garlic',
+        'chicken',
+        'cheese',
+        'tomato',
+        'vegetables',
+        'bread',
+    ])
+    target_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows,
+        _generate_random_recipe,
+        replacement=False,
+        filter_fn=lambda row: ingredient in row.directions.lower(),
+    )
+    noise_rows = sqlite_schema_utils.get_random_items(
+        cls.n_rows_noise,
+        _generate_random_recipe,
+        replacement=False,
+        filter_fn=lambda row: ingredient not in row.directions.lower(),
+    )
+    return {
+        sqlite_validators.ROW_OBJECTS: target_rows,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_rows,
+        _TEXT_REPRESENTATION_TYPE: random.choice(['csv', 'text_block']),
+        'ingredient': ingredient,
+    }
+
 #### Utility functions used for generating recipes #############################
 
 

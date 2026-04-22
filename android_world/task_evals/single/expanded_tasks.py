@@ -16,7 +16,11 @@
 
 from typing import Any
 
+from android_world.task_evals.single import contacts
+from android_world.task_evals.single import expense
 from android_world.task_evals.single import markor
+from android_world.task_evals.single import recipe
+from android_world.task_evals.single import sms
 from android_world.task_evals.single.calendar import calendar
 
 
@@ -252,6 +256,174 @@ _SPECS = [
         "medium",
         ["data_edit", "math_counting", "requires_setup", "parameterized"],
         "6",
+    ),
+    (
+        "ContactsAddClipboardContact",
+        contacts.ContactsAddClipboardContact,
+        "In Contacts, create a new contact using the clipboard details. The"
+        " contact name should be {name} and the number should be {number}.",
+        "medium",
+        ["data_entry", "cross_app", "parameterized"],
+        "7",
+    ),
+    (
+        "ContactsAddEmergencyContact",
+        contacts.ContactsAddEmergencyContact,
+        "In Contacts, add the emergency contact described in the latest text"
+        " message from {sender_number}.",
+        "medium",
+        ["data_entry", "information_extraction", "requires_setup"],
+        "9",
+    ),
+    (
+        "ContactsAddFromIncomingSms",
+        contacts.ContactsAddFromIncomingSms,
+        "In Contacts, add the person and phone number described in the latest"
+        " text message from {sender_number}.",
+        "medium",
+        ["data_entry", "information_extraction", "requires_setup"],
+        "9",
+    ),
+    (
+        "ContactsAddFromMarkorNote",
+        contacts.ContactsAddFromMarkorNote,
+        "In Markor, open contacts_to_add.txt and add the contact listed for"
+        " {role} to Contacts.",
+        "hard",
+        [
+            "data_entry",
+            "cross_app",
+            "information_extraction",
+            "requires_setup",
+        ],
+        "13",
+    ),
+    (
+        "ExpenseAddFoodPurchase",
+        expense.ExpenseAddFoodPurchase,
+        "In Pro Expense, add this {category} expense: name {expense_name},"
+        " amount {amount}, note {note}.",
+        "medium",
+        ["data_entry", "parameterized"],
+        "9",
+    ),
+    (
+        "ExpenseAddHighValueExpensesFromMarkor",
+        expense.ExpenseAddHighValueExpensesFromMarkor,
+        "In Markor, open expense_candidates.txt. Add only the expenses with"
+        " amount at least {min_amount} into Pro Expense.",
+        "hard",
+        [
+            "data_entry",
+            "cross_app",
+            "information_extraction",
+            "requires_setup",
+        ],
+        "28",
+    ),
+    (
+        "ExpenseAddTwoEducationExpenses",
+        expense.ExpenseAddTwoEducationExpenses,
+        "In Pro Expense, add these two Education expenses:\n{expense_summary}",
+        "hard",
+        ["data_entry", "repetition", "parameterized"],
+        "18",
+    ),
+    (
+        "ExpenseDeleteEntertainmentExpenses",
+        expense.ExpenseDeleteEntertainmentExpenses,
+        "In Pro Expense, delete all {category} expenses and leave the other"
+        " expenses unchanged.",
+        "medium",
+        ["data_edit", "search", "requires_setup", "parameterized"],
+        "12",
+    ),
+    (
+        "RecipeAddRecipesFromMarkorWithIngredient",
+        recipe.RecipeAddRecipesFromMarkorWithIngredient,
+        "In Markor, open recipe_candidates.txt. Add only the recipes whose"
+        " directions mention {ingredient} into Broccoli app.",
+        "hard",
+        [
+            "data_entry",
+            "cross_app",
+            "information_extraction",
+            "requires_setup",
+        ],
+        "32",
+    ),
+    (
+        "RecipeAddThirtyMinuteRecipe",
+        recipe.RecipeAddThirtyMinuteRecipe,
+        "In Broccoli app, add the recipe {recipe_title}. Description:"
+        " {description}. Servings: {servings}. Preparation time: {prep_time}."
+        " Ingredients: {ingredients}. Directions: {directions}.",
+        "hard",
+        ["data_entry", "parameterized"],
+        "18",
+    ),
+    (
+        "RecipeAddTwoFamilyServingRecipes",
+        recipe.RecipeAddTwoFamilyServingRecipes,
+        "In Broccoli app, add these two recipes that each make {servings}:\n"
+        "{recipe_summary}",
+        "hard",
+        ["data_entry", "repetition", "parameterized"],
+        "32",
+    ),
+    (
+        "RecipeDeleteThirtyMinuteRecipes",
+        recipe.RecipeDeleteThirtyMinuteRecipes,
+        "In Broccoli app, delete every recipe with preparation time"
+        " {prep_time}.",
+        "medium",
+        ["data_edit", "search", "requires_setup", "parameterized"],
+        "12",
+    ),
+    (
+        "SimpleSmsForwardSecurityCode",
+        sms.SimpleSmsForwardSecurityCode,
+        "In Simple SMS Messenger, forward the security code from {sender_name}"
+        " to {recipient_name}. Send only the code.",
+        "medium",
+        [
+            "data_entry",
+            "information_extraction",
+            "requires_setup",
+            "parameterized",
+        ],
+        "10",
+    ),
+    (
+        "SimpleSmsForwardTrackingNumber",
+        sms.SimpleSmsForwardTrackingNumber,
+        "In Simple SMS Messenger, forward the package tracking number from"
+        " {sender_name} to {recipient_name}. Send only the tracking number.",
+        "medium",
+        [
+            "data_entry",
+            "information_extraction",
+            "requires_setup",
+            "parameterized",
+        ],
+        "10",
+    ),
+    (
+        "SimpleSmsSendToSavedContact",
+        sms.SimpleSmsSendToSavedContact,
+        "In Simple SMS Messenger, send {message} to the saved contact {name}.",
+        "medium",
+        ["data_entry", "search", "requires_setup", "parameterized"],
+        "8",
+    ),
+    (
+        "SimpleSmsTextClipboardToSavedContact",
+        sms.SimpleSmsTextClipboardToSavedContact,
+        "In Simple SMS Messenger, send the clipboard content to the saved"
+        " contact {name}.",
+        "medium",
+        ["data_entry", "cross_app", "requires_setup", "parameterized"],
+        "9",
     ),
 ]
 

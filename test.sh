@@ -1,3 +1,3 @@
 python minimal_task_runner.py --agent_name=human_agent \
-  --task=MarkorReplaceTextInNote
+  --task=MarkorCreateChecklistNote
   # --perform_emulator_setup
