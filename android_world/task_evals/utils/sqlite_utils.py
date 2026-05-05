@@ -15,13 +15,86 @@
 """Utility functions for interacting with SQLite database on an Android device."""
 
 import os
+import shutil
 import sqlite3
+import subprocess
 import time
 from typing import Optional, Type
 from android_world.env import adb_utils
 from android_world.env import interface
 from android_world.task_evals.utils import sqlite_schema_utils
 from android_world.utils import file_utils
+
+
+def _find_external_sqlite() -> str:
+  """Returns a sqlite3 binary that can handle Android app databases."""
+  potential_paths = [
+      os.path.expanduser('~/Library/Android/sdk/platform-tools/sqlite3'),
+      os.path.expanduser('~/Android/Sdk/platform-tools/sqlite3'),
+      shutil.which('sqlite3'),
+  ]
+  for path in potential_paths:
+    if path and os.path.isfile(path):
+      return path
+  raise EnvironmentError(
+      'sqlite3 with Android database support was not found. Please install'
+      ' Android SDK platform-tools or put sqlite3 on PATH.'
+  )
+
+
+def _is_missing_fts4_error(error: sqlite3.OperationalError) -> bool:
+  return 'no such module: fts4' in str(error).lower()
+
+
+def _quote_sql_value(value: object) -> str:
+  """Converts a Python value into a SQLite literal."""
+  if value is None:
+    return 'NULL'
+  if isinstance(value, bool):
+    return str(int(value))
+  if isinstance(value, (int, float)):
+    return str(value)
+  if isinstance(value, bytes):
+    return "X'" + value.hex() + "'"
+  return "'" + str(value).replace("'", "''") + "'"
+
+
+def _inline_sql_parameters(command: str, values: tuple[object, ...]) -> str:
+  """Returns a SQL command with positional parameters inlined as literals."""
+  parts = command.split('?')
+  if len(parts) != len(values) + 1:
+    raise ValueError('SQL command placeholder count does not match values.')
+  result = []
+  for part, value in zip(parts, values):
+    result.append(part)
+    result.append(_quote_sql_value(value))
+  result.append(parts[-1])
+  return ''.join(result)
+
+
+def _execute_external_sqlite(
+    db_path: str, commands: list[str], use_transaction: bool = True
+) -> None:
+  """Executes SQL with an external sqlite3 binary.
+
+  Some Android app databases contain FTS4 virtual tables. The Python sqlite3
+  build used by some conda environments does not include FTS4, while Android
+  SDK platform-tools sqlite3 does.
+  """
+  sqlite_binary = _find_external_sqlite()
+  script_lines = []
+  if use_transaction:
+    script_lines.extend(['PRAGMA foreign_keys = OFF;', 'BEGIN;'])
+  script_lines.extend(command.rstrip(';') + ';' for command in commands)
+  if use_transaction:
+    script_lines.append('COMMIT;')
+  subprocess.run(
+      [sqlite_binary, db_path],
+      input='\n'.join(script_lines) + '\n',
+      text=True,
+      capture_output=True,
+      check=True,
+  )
 
 
 def execute_query(
@@ -161,9 +234,17 @@ def delete_all_rows_from_table(
     conn = sqlite3.connect(local_db_path)
     cursor = conn.cursor()
     delete_command = f"DELETE FROM {table_name}"
-    cursor.execute(delete_command)
-    conn.commit()
-    conn.close()
+    try:
+      cursor.execute(delete_command)
+      conn.commit()
+    except sqlite3.OperationalError as e:
+      conn.rollback()
+      conn.close()
+      if not _is_missing_fts4_error(e):
+        raise
+      _execute_external_sqlite(local_db_path, [delete_command])
+    else:
+      conn.close()
     env.controller.push_file(local_db_path, remote_db_file_path, timeout_sec)
     adb_utils.close_app(
         app_name, env.controller
@@ -200,13 +281,31 @@ def insert_rows_to_remote_db(
 
     conn = sqlite3.connect(local_db_path)
     cursor = conn.cursor()
-    for row in rows:
+    insert_commands = []
+    for index, row in enumerate(rows):
       insert_command, values = sqlite_schema_utils.insert_into_db(
           row, table_name, exclude_key
       )
-      cursor.execute(insert_command, values)
-    conn.commit()
-    conn.close()
+      insert_commands.append(_inline_sql_parameters(insert_command, values))
+      try:
+        cursor.execute(insert_command, values)
+      except sqlite3.OperationalError as e:
+        conn.rollback()
+        conn.close()
+        if not _is_missing_fts4_error(e):
+          raise
+        for remaining_row in rows[index + 1 :]:
+          insert_command, values = sqlite_schema_utils.insert_into_db(
+              remaining_row, table_name, exclude_key
+          )
+          insert_commands.append(
+              _inline_sql_parameters(insert_command, values)
+          )
+        _execute_external_sqlite(local_db_path, insert_commands)
+        break
+    else:
+      conn.commit()
+      conn.close()
 
     env.controller.push_file(local_db_path, remote_db_file_path, timeout_sec)
     adb_utils.close_app(app_name, env.controller)

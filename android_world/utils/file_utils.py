@@ -124,7 +124,7 @@ def clear_directory(
   if folder_contents:
     adb_utils.check_ok(
         adb_utils.issue_generic_request(
-            ["shell", "rm", "-r", f"{directory_path}/*"],
+            ["shell", "rm", "-rf", f"{directory_path}/*"],
             env,
         ),
         f"Failed to clear directory {directory_path}.",

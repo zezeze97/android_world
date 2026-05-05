@@ -34,8 +34,17 @@ _HOUR = "hour"
 EVENT_TITLE = "event_title"
 _EVENT_DESCRIPTION = "event_description"
 _DURATION_MINS = "duration_mins"
+_LOCATION = "location"
 _REPEAT_INTERVAL = "repeat_rule"
 _REPEAT_INTERVALS = {"daily": 60 * 60 * 24, "weekly": 60 * 60 * 24 * 7}
+_EVENT_LOCATIONS = [
+    "Building A Conference Room",
+    "Downtown Library",
+    "Main Office",
+    "North Campus",
+    "Remote Video Call",
+    "Training Room 2",
+]
 
 
 def generate_noise_events(
@@ -218,6 +227,209 @@ class SimpleCalendarAddOneEventInTwoWeeks(SimpleCalendarAddOneEvent):
     )
 
 
+class SimpleCalendarAddEventWithLocation(SimpleCalendarAddOneEvent):
+  """Task for creating a calendar event with a location."""
+
+  complexity = 3.6
+  template = (
+      "In Simple Calendar Pro, create a calendar event on {year}-{month}-{day}"
+      " at {hour}h located at '{location}' with the title '{event_title}' and"
+      " the description '{event_description}'. The event should last for"
+      " {duration_mins} mins."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    event = dataclasses.replace(
+        cls._get_random_target_row(),
+        location=random.choice(_EVENT_LOCATIONS),
+    )
+    n_noise_events = random.randint(0, 20)
+    return {
+        _YEAR: device_constants.DT.year,
+        _MONTH: device_constants.DT.month,
+        _DAY: event.start_datetime.day,
+        _HOUR: event.start_datetime.hour,
+        _DURATION_MINS: event.duration_mins,
+        EVENT_TITLE: event.title,
+        _EVENT_DESCRIPTION: event.description,
+        _LOCATION: event.location,
+        sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: generate_noise_events(
+            [event], n_noise_events
+        ),
+    }
+
+
+class SimpleCalendarAddLongEvent(SimpleCalendarAddOneEvent):
+  """Task for creating a longer calendar event."""
+
+  complexity = 3.6
+  template = (
+      "In Simple Calendar Pro, create a long calendar event on"
+      " {year}-{month}-{day} at {hour}h with the title '{event_title}' and"
+      " the description '{event_description}'. The event should last for"
+      " {duration_mins} mins."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    event_template = cls._get_random_target_row()
+    duration_mins = random.choice([90, 120, 180])
+    event = dataclasses.replace(
+        event_template,
+        end_ts=event_template.start_ts + duration_mins * 60,
+    )
+    return {
+        _YEAR: device_constants.DT.year,
+        _MONTH: device_constants.DT.month,
+        _DAY: event.start_datetime.day,
+        _HOUR: event.start_datetime.hour,
+        _DURATION_MINS: event.duration_mins,
+        EVENT_TITLE: event.title,
+        _EVENT_DESCRIPTION: event.description,
+        sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: generate_noise_events(
+            [event], random.randint(0, 20)
+        ),
+    }
+
+
+class SimpleCalendarAddEventNextWeek(SimpleCalendarAddOneEvent):
+  """Task for creating an event on a named day next week."""
+
+  complexity = 3.6
+  template = (
+      "In Simple Calendar Pro, create a calendar event for next {day_of_week}"
+      " at {hour}h with the title '{event_title}' and the description"
+      " '{event_description}'. The event should last for {duration_mins} mins."
+  )
+
+  @classmethod
+  def _get_random_target_row(cls):
+    return events_generator.generate_event(
+        datetime_utils.create_random_october_2023_unix_ts(
+            start_day=device_constants.DT.day + 7,
+            end_day=device_constants.DT.day + 13,
+        )
+    )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    event = cls._get_random_target_row()
+    return {
+        _DAY_OF_WEEK: event.start_datetime.strftime("%A"),
+        _HOUR: event.start_datetime.hour,
+        _DURATION_MINS: event.duration_mins,
+        EVENT_TITLE: event.title,
+        _EVENT_DESCRIPTION: event.description,
+        sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: generate_noise_events(
+            [event], random.randint(0, 20)
+        ),
+    }
+
+
+class SimpleCalendarAddTwoEventsSameDay(SimpleCalendarAddOneEvent):
+  """Task for creating two events on the same calendar day."""
+
+  n_rows = 2
+  complexity = 4.6
+  template = (
+      "In Simple Calendar Pro, create two calendar events on"
+      " {year}-{month}-{day}: first at {hour1}h titled '{event_title1}' with"
+      " description '{event_description1}' lasting {duration_mins1} mins, and"
+      " second at {hour2}h titled '{event_title2}' with description"
+      " '{event_description2}' lasting {duration_mins2} mins."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    day = random.randint(device_constants.DT.day, 31)
+    hour1, hour2 = sorted(random.sample(range(8, 20), 2))
+    event1 = events_generator.generate_event(
+        datetime_utils._create_unix_ts(day=day, hour=hour1)
+    )
+    event2 = events_generator.generate_event(
+        datetime_utils._create_unix_ts(day=day, hour=hour2)
+    )
+    events = [event1, event2]
+    noise_events = generate_noise_events(
+        events,
+        random.randint(0, 20),
+        filter_fn=lambda candidate: (
+            candidate.start_datetime.day != day
+            and candidate.title not in (event.title for event in events)
+        ),
+    )
+    return {
+        _YEAR: device_constants.DT.year,
+        _MONTH: device_constants.DT.month,
+        _DAY: day,
+        "hour1": event1.start_datetime.hour,
+        "hour2": event2.start_datetime.hour,
+        "duration_mins1": event1.duration_mins,
+        "duration_mins2": event2.duration_mins,
+        "event_title1": event1.title,
+        "event_title2": event2.title,
+        "event_description1": event1.description,
+        "event_description2": event2.description,
+        sqlite_validators.ROW_OBJECTS: events,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
+    }
+
+
+class SimpleCalendarAddTwoEventsDifferentDays(SimpleCalendarAddOneEvent):
+  """Task for creating two events on different calendar days."""
+
+  n_rows = 2
+  complexity = 4.8
+  template = (
+      "In Simple Calendar Pro, create two calendar events: one on"
+      " {year}-{month}-{day1} at {hour1}h titled '{event_title1}' with"
+      " description '{event_description1}' lasting {duration_mins1} mins, and"
+      " one on {year}-{month}-{day2} at {hour2}h titled '{event_title2}' with"
+      " description '{event_description2}' lasting {duration_mins2} mins."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    day1, day2 = sorted(random.sample(range(device_constants.DT.day, 32), 2))
+    hour1 = random.randint(8, 18)
+    hour2 = random.randint(8, 18)
+    event1 = events_generator.generate_event(
+        datetime_utils._create_unix_ts(day=day1, hour=hour1)
+    )
+    event2 = events_generator.generate_event(
+        datetime_utils._create_unix_ts(day=day2, hour=hour2)
+    )
+    events = [event1, event2]
+    noise_events = generate_noise_events(
+        events,
+        random.randint(0, 20),
+        filter_fn=lambda candidate: (
+            candidate.start_datetime.day not in {day1, day2}
+            and candidate.title not in (event.title for event in events)
+        ),
+    )
+    return {
+        _YEAR: device_constants.DT.year,
+        _MONTH: device_constants.DT.month,
+        "day1": day1,
+        "day2": day2,
+        "hour1": event1.start_datetime.hour,
+        "hour2": event2.start_datetime.hour,
+        "duration_mins1": event1.duration_mins,
+        "duration_mins2": event2.duration_mins,
+        "event_title1": event1.title,
+        "event_title2": event2.title,
+        "event_description1": event1.description,
+        "event_description2": event2.description,
+        sqlite_validators.ROW_OBJECTS: events,
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
+    }
+
+
 class SimpleCalendarAddRepeatingEvent(SimpleCalendarAddOneEvent):
   """Task for creating a repeating calendar event in Simple Calendar Pro."""
 
@@ -360,6 +572,92 @@ class SimpleCalendarDeleteOneEvent(SimpleCalendarDeleteEvents):
         EVENT_TITLE: event.title,
         _EVENT_DESCRIPTION: event.description,
         sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
+    }
+
+
+class SimpleCalendarDeleteEventByTitle(SimpleCalendarDeleteOneEvent):
+  """Task to delete a single calendar event using only its title."""
+
+  complexity = 1.4
+  template = (
+      "In Simple Calendar Pro, delete the calendar event titled"
+      " '{event_title}'."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    event = cls._get_random_target_row()
+    noise_events = generate_noise_events(
+        [event],
+        cls.n_rows_noise,
+        filter_fn=lambda candidate: candidate.title != event.title,
+    )
+    return {
+        EVENT_TITLE: event.title,
+        sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
+    }
+
+
+class SimpleCalendarDeleteEventByTitleAndDate(SimpleCalendarDeleteOneEvent):
+  """Task to delete a single calendar event using title and date."""
+
+  complexity = 1.4
+  template = (
+      "In Simple Calendar Pro, delete the calendar event titled"
+      " '{event_title}' on {year}-{month}-{day}."
+  )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    event = cls._get_random_target_row()
+    noise_events = generate_noise_events(
+        [event],
+        cls.n_rows_noise,
+        filter_fn=lambda candidate: (
+            candidate.title != event.title
+            and candidate.start_datetime.day != event.start_datetime.day
+        ),
+    )
+    return {
+        _YEAR: device_constants.DT.year,
+        _MONTH: device_constants.DT.month,
+        _DAY: event.start_datetime.day,
+        EVENT_TITLE: event.title,
+        sqlite_validators.ROW_OBJECTS: [event],
+        sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
+    }
+
+
+class SimpleCalendarDeleteTomorrowEvents(SimpleCalendarDeleteEvents):
+  """Task to delete all calendar events scheduled for tomorrow."""
+
+  n_rows = 2
+  n_rows_noise = 20
+  complexity = 1.4
+  template = "In Simple Calendar Pro, delete all calendar events for tomorrow."
+
+  @classmethod
+  def _get_random_target_row(cls):
+    return events_generator.generate_event(
+        datetime_utils.create_random_october_2023_unix_ts(
+            start_day=device_constants.DT.day + 1,
+            end_day=device_constants.DT.day + 1,
+        )
+    )
+
+  @classmethod
+  def generate_random_params(cls) -> dict[str, Any]:
+    events = [cls._get_random_target_row() for _ in range(cls.n_rows)]
+    tomorrow = device_constants.DT.day + 1
+    noise_events = generate_noise_events(
+        events,
+        cls.n_rows_noise,
+        filter_fn=lambda candidate: candidate.start_datetime.day != tomorrow,
+    )
+    return {
+        sqlite_validators.ROW_OBJECTS: events,
         sqlite_validators.NOISE_ROW_OBJECTS: noise_events,
     }
 

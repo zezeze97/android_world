@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from collections.abc import Iterable
+import dataclasses
 import random
 from typing import cast
 from unittest import mock
@@ -43,6 +44,16 @@ def _sample_events(
         description="noise" + str(random.randint(0, 1_000_000)),
     )
     yield random.choice([event, noise])
+
+
+def _with_db_ids(
+    rows: list[sqlite_schema_utils.CalendarEvent],
+    start_id: int = 1,
+) -> list[sqlite_schema_utils.CalendarEvent]:
+  return [
+      dataclasses.replace(row, id=start_id + index)
+      for index, row in enumerate(rows)
+  ]
 
 
 class CalendarEventTestSetup(parameterized.TestCase):
@@ -192,6 +203,111 @@ class TestSimpleCalendarAddOneEventRelativeDay(CalendarEventTestSetup):
     )
 
 
+class TestSimpleCalendarAddEventWithLocation(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    task = calendar.SimpleCalendarAddEventWithLocation(
+        calendar.SimpleCalendarAddEventWithLocation.generate_random_params()
+    )
+    self.mock_list_rows.side_effect = [[], task.params["row_objects"]]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    params = calendar.SimpleCalendarAddEventWithLocation.generate_random_params()
+    self.assertIn("location", params)
+    self.assertIn(params["location"], calendar._EVENT_LOCATIONS)
+    self.assertEqual(params["row_objects"][0].location, params["location"])
+
+
+class TestSimpleCalendarAddLongEvent(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    task = calendar.SimpleCalendarAddLongEvent(
+        calendar.SimpleCalendarAddLongEvent.generate_random_params()
+    )
+    self.mock_list_rows.side_effect = [[], task.params["row_objects"]]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    params = calendar.SimpleCalendarAddLongEvent.generate_random_params()
+    self.assertIn(params["duration_mins"], [90, 120, 180])
+    self.assertEqual(
+        params["row_objects"][0].duration_mins, params["duration_mins"]
+    )
+
+
+class TestSimpleCalendarAddEventNextWeek(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    task = calendar.SimpleCalendarAddEventNextWeek(
+        calendar.SimpleCalendarAddEventNextWeek.generate_random_params()
+    )
+    self.mock_list_rows.side_effect = [[], task.params["row_objects"]]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    params = calendar.SimpleCalendarAddEventNextWeek.generate_random_params()
+    event = params["row_objects"][0]
+    self.assertGreaterEqual(event.start_datetime.day, 22)
+    self.assertLessEqual(event.start_datetime.day, 28)
+    self.assertEqual(
+        params["day_of_week"], event.start_datetime.strftime("%A")
+    )
+
+
+class TestSimpleCalendarAddTwoEventsSameDay(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    task = calendar.SimpleCalendarAddTwoEventsSameDay(
+        calendar.SimpleCalendarAddTwoEventsSameDay.generate_random_params()
+    )
+    self.mock_list_rows.side_effect = [[], task.params["row_objects"]]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    params = calendar.SimpleCalendarAddTwoEventsSameDay.generate_random_params()
+    events = cast(
+        list[sqlite_schema_utils.CalendarEvent], params["row_objects"]
+    )
+    self.assertLen(events, 2)
+    self.assertEqual(events[0].start_datetime.day, events[1].start_datetime.day)
+    self.assertLess(
+        events[0].start_datetime.hour, events[1].start_datetime.hour
+    )
+
+
+class TestSimpleCalendarAddTwoEventsDifferentDays(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    task = calendar.SimpleCalendarAddTwoEventsDifferentDays(
+        calendar.SimpleCalendarAddTwoEventsDifferentDays.generate_random_params()
+    )
+    self.mock_list_rows.side_effect = [[], task.params["row_objects"]]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    params = (
+        calendar.SimpleCalendarAddTwoEventsDifferentDays.generate_random_params()
+    )
+    events = cast(
+        list[sqlite_schema_utils.CalendarEvent], params["row_objects"]
+    )
+    self.assertLen(events, 2)
+    self.assertNotEqual(
+        events[0].start_datetime.day, events[1].start_datetime.day
+    )
+
+
 class TestSimpleCalendarAddOneEventInTwoWeeks(CalendarEventTestSetup):
 
   def test_is_successful(self):
@@ -216,6 +332,75 @@ class TestSimpleCalendarDeleteEventsOnRelativeDay(CalendarEventTestSetup):
         list[sqlite_schema_utils.CalendarEvent], param["row_objects"]
     ).copy()
     self.assertLen(events, 2)
+
+
+class TestSimpleCalendarDeleteEventByTitle(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    param = calendar.SimpleCalendarDeleteEventByTitle.generate_random_params()
+    target = dataclasses.replace(param["row_objects"][0], id=1)
+    noise = [
+        dataclasses.replace(row, id=index + 2)
+        for index, row in enumerate(param["noise_row_objects"])
+    ]
+    before = noise + [target]
+    task = calendar.SimpleCalendarDeleteEventByTitle(param)
+    self.mock_list_rows.side_effect = [before, noise]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    param = calendar.SimpleCalendarDeleteEventByTitle.generate_random_params()
+    self.assertIn("event_title", param)
+    self.assertEqual(param["row_objects"][0].title, param["event_title"])
+
+
+class TestSimpleCalendarDeleteEventByTitleAndDate(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    param = (
+        calendar.SimpleCalendarDeleteEventByTitleAndDate.generate_random_params()
+    )
+    target = _with_db_ids(param["row_objects"], start_id=1)
+    noise = _with_db_ids(param["noise_row_objects"], start_id=2)
+    before = noise + target
+    task = calendar.SimpleCalendarDeleteEventByTitleAndDate(param)
+    self.mock_list_rows.side_effect = [before, noise]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    param = (
+        calendar.SimpleCalendarDeleteEventByTitleAndDate.generate_random_params()
+    )
+    event = param["row_objects"][0]
+    self.assertEqual(event.title, param["event_title"])
+    self.assertEqual(event.start_datetime.day, param["day"])
+
+
+class TestSimpleCalendarDeleteTomorrowEvents(CalendarEventTestSetup):
+
+  def test_is_successful(self):
+    param = calendar.SimpleCalendarDeleteTomorrowEvents.generate_random_params()
+    targets = _with_db_ids(param["row_objects"], start_id=1)
+    noise = _with_db_ids(param["noise_row_objects"], start_id=3)
+    before = noise + targets
+    task = calendar.SimpleCalendarDeleteTomorrowEvents(param)
+    self.mock_list_rows.side_effect = [before, noise]
+    task.initialize_task(self.env)
+    result = task.is_successful(self.env)
+    self.assertEqual(result, 1)
+
+  def test_generate_random_params(self):
+    param = calendar.SimpleCalendarDeleteTomorrowEvents.generate_random_params()
+    events = cast(
+        list[sqlite_schema_utils.CalendarEvent], param["row_objects"]
+    )
+    self.assertLen(events, 2)
+    for event in events:
+      self.assertEqual(event.start_datetime.day, 16)
 
 
 class TestSimpleCalendarAddRepeatingEvent(CalendarEventTestSetup):

@@ -93,10 +93,16 @@ o
 
 Run the `minimal_task_runner.py` script to see the basic mechanics of
 AndroidWorld components. It initializes the environment, sets up a task, and
-runs the default agent, M3A, on it.
+runs the default quickstart agent on it.
 ```bash
 python minimal_task_runner.py --task=ContactsAddContact
 ```
+
+The quickstart now auto-selects an available agent. If `OPENAI_API_KEY` is
+set, it uses `t3a_gpt4`; if `GCP_API_KEY` is set, it uses
+`t3a_gemini_gcp`; otherwise it falls back to `random_agent` so you can still
+verify that the environment boots and tasks initialize correctly. You can
+override this explicitly with `--agent_name=...`.
 
 If you don't specify a task, a random task will be selected. *NOTE: If you want
 to try open-source apps, i.e. not included with Android OS, please run
